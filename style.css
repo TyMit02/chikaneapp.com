@@ -50,7 +50,7 @@ body {
 
 /* Hero Section */
 .hero {
-    background: url('images/hero-bg.jpg') no-repeat center center/cover;
+    background: #0A1828; /* Solid navy blue background */
     height: 80vh;
     display: flex;
     align-items: center;
@@ -58,7 +58,6 @@ body {
     text-align: center;
     padding: 0 2rem;
 }
-
 .hero-content {
     color: #E6F0FF; /* Light blue text */
     max-width: 800px;
@@ -246,17 +245,19 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 20px; /* Add spacing between buttons */
-    margin-top: 20px;
+    margin-top: 30px; /* More space above the buttons */
 }
 
+/* Download Button Styling */
 .download-button {
-    padding: 15px 30px;
+    padding: 15px 40px; /* Increased padding for larger buttons */
     background-color: #FF4500; /* Accent color */
     color: white;
     text-decoration: none;
     border-radius: 5px;
-    font-size: 1.1rem;
+    font-size: 1.2rem; /* Larger font for better readability */
     transition: background 0.3s, transform 0.2s;
+    width: auto; /* Allows buttons to adjust based on text length */
 }
 
 .download-button:hover {
@@ -264,9 +265,24 @@ body {
     transform: translateY(-3px);
 }
 
+/* Disabled Button Styling */
 .download-button.disabled {
     background-color: #A0A0A0; /* Gray for disabled */
     cursor: not-allowed;
+    color: #fff; /* Ensures white text on the button */
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .download-buttons {
+        flex-direction: column; /* Stack buttons vertically */
+        align-items: stretch; /* Make buttons full width */
+    }
+
+    .download-button {
+        width: 100%;
+        max-width: 300px; /* Max width for large screens */
+    }
 }
 
 /* Inquiry Form */
