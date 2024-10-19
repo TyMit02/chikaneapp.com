@@ -31,15 +31,65 @@
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const database = getDatabase(app);
+
+        // Fetch real-time laps data
+        window.addEventListener('DOMContentLoaded', () => {
+            const lapsRef = ref(database, 'laps'); // Assuming 'laps' is the node for total laps
+
+            onValue(lapsRef, (snapshot) => {
+                const totalLaps = snapshot.val() || 0; // Default to 0 if no data
+                document.querySelector('.stats-number').textContent = totalLaps + '+';
+            });
+        });
     </script>
 </head>
 <body>
+    <!-- Sticky Navbar -->
+    <nav class="navbar sticky">
+        <div class="container">
+            <img src="images/logo.png" alt="Chikane Logo" class="logo">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="features.html">Features</a></li>
+                <li><a href="getting-started.html">Getting Started</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Chikane - Track Every Millisecond</h1>
+            <p>The most precise lap timing & event management software for racers.</p>
+            <a href="features.html" class="cta-button">Explore Features</a>
+        </div>
+    </section>
+
+    <!-- Real-Time Stats Bar -->
+    <div class="stats-bar">
+        <div class="stats-item">
+            <span class="stats-number">0+</span>
+            <p>Laps Timed</p>
+        </div>
+        <div class="stats-item">
+            <span class="stats-number">10+</span>
+            <p>Events Supported</p>
+        </div>
+        <div class="stats-item">
+            <span class="stats-number">30+</span>
+            <p>Users Onboarded</p>
+        </div>
+    </div>
+
     <!-- Map Section -->
     <section class="map-section">
         <h2>Tracks Supported by Chikane</h2>
         <div id="map" style="height: 500px;"></div>
     </section>
 
+    <!-- Leaflet Map Script -->
     <script type="module">
         // Initialize Leaflet map
         const map = L.map('map').setView([20, 0], 2); // Initial view: World
@@ -75,7 +125,6 @@
                 "latitude": 30.1328,
                 "longitude": -97.6411
             }
-            // Add more tracks from the JSON data
         ];
 
         // Add markers to the map
@@ -85,5 +134,12 @@
                 .bindPopup(`<b>${track.name}</b>`);
         });
     </script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Chikane. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>
