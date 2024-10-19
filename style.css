@@ -472,3 +472,30 @@ body {
     max-width: 700px;
     margin: 0 auto 1.5rem;
 }
+/* Map Section */
+.map-section {
+    padding: 60px 20px;
+    text-align: center;
+    background: #1A2838; /* Slightly lighter navy */
+}
+
+.map-container {
+    max-width: 80%;
+    margin: 0 auto;
+    background: #0A1828; /* Deep navy */
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.map-container h2 {
+    color: #FF4500; /* Accent color */
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.styled-map {
+    height: 500px;
+    border: 3px solid #FF4500; /* Accent border */
+    border-radius: 10px;
+}
