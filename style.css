@@ -217,3 +217,280 @@ body {
 .feature-comparison td:first-child {
     font-weight: bold;
 }
+
+/* Progress Tracker */
+.progress-tracker {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.progress-bar {
+    display: flex;
+    gap: 10px;
+}
+
+.progress-step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #C0C0C0; /* Silver */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-step.active {
+    background-color: #FF4500; /* Bright orange-red */
+}
+
+/* Step-by-Step Guide */
+.getting-started .step {
+    margin: 40px 0;
+    padding: 20px;
+    background-color: #1A2838; /* Slightly lighter navy */
+    border-radius: 10px;
+    text-align: center;
+}
+
+.download-button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #FF4500; /* Accent color */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.download-button.disabled {
+    background-color: #A0A0A0; /* Gray for disabled */
+    cursor: not-allowed;
+}
+
+/* Inquiry Form */
+.inquiry-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.inquiry-form input, .inquiry-form select, .inquiry-form textarea {
+    padding: 10px;
+    border: 1px solid #C0C0C0;
+    border-radius: 5px;
+    background-color: #F0F0F0;
+}
+
+.inquiry-form button {
+    padding: 10px 20px;
+    background-color: #FF4500;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.inquiry-form button:hover {
+    background-color: #FF6533;
+}
+
+/* About Intro */
+.about-intro {
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.about-intro h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #FF4500; /* Accent color */
+}
+
+.about-intro p {
+    font-size: 1.2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* Mission Section */
+.mission {
+    background-color: #1A2838; /* Slightly lighter navy */
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.mission h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #E6F0FF; /* Light blue text */
+}
+
+.mission p {
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto;
+    color: #C0C0C0; /* Silver text */
+}
+
+/* Timeline */
+.timeline {
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.timeline h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.timeline-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+.timeline-item {
+    background-color: #0A1828; /* Deep navy */
+    padding: 20px;
+    border-radius: 10px;
+    color: #E6F0FF; /* Light blue text */
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+}
+
+.timeline-item h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #FF4500; /* Accent color */
+}
+
+.timeline-item p {
+    font-size: 1.1rem;
+}
+/* Contact Section */
+.contact-section {
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.contact-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.contact-section p {
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto 30px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.contact-form input, .contact-form textarea {
+    padding: 10px;
+    border: 1px solid #C0C0C0;
+    border-radius: 5px;
+    background-color: #F0F0F0;
+}
+
+.contact-form button {
+    padding: 10px 20px;
+    background-color: #FF4500; /* Accent color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.contact-form button:hover {
+    background-color: #FF6533;
+}
+
+/* Contact Details */
+.contact-details {
+    margin-top: 50px;
+    text-align: left;
+}
+
+.contact-details h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.contact-details p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+/* Map Section */
+.contact-map {
+    padding: 50px 0;
+    text-align: center;
+}
+
+.contact-map h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* Privacy Policy Section */
+.privacy-policy {
+    padding: 50px 20px;
+    text-align: left;
+}
+
+.privacy-policy h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.toc {
+    margin-top: 30px;
+    margin-bottom: 40px;
+}
+
+.toc h2 {
+    font-size: 2rem;
+}
+
+.toc ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.toc li {
+    margin-bottom: 10px;
+}
+
+.toc a {
+    color: #FF4500; /* Accent color */
+    text-decoration: none;
+}
+
+.toc a:hover {
+    text-decoration: underline;
+}
+
+.privacy-policy h2 {
+    font-size: 2rem;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.privacy-policy p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}

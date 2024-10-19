@@ -8,13 +8,13 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
+    <nav class="navbar sticky">
         <div class="container">
             <img src="images/logo.png" alt="Chikane Logo" class="logo">
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="features.html">Features</a></li>
-                <li><a href="getting-started.html">Events</a></li>
+                <li><a href="getting-started.html">Getting Started</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
@@ -22,17 +22,52 @@
     </nav>
 
     <!-- Contact Section -->
-    <section class="contact">
+    <section class="contact-section">
         <div class="container">
-            <h2>Contact Us</h2>
-            <form>
-                <input type="text" placeholder="Name" required>
-                <input type="email" placeholder="Email" required>
-                <textarea placeholder="Message" required></textarea>
-                <button type="submit">Send</button>
+            <h1>Contact Us</h1>
+            <p>We'd love to hear from you! Whether you have questions about Chikane, need support, or want to provide feedback, please fill out the form below.</p>
+
+            <!-- Contact Form -->
+            <form class="contact-form">
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="Your Email" required>
+                <input type="text" placeholder="Subject" required>
+                <textarea placeholder="Your Message" required></textarea>
+                <button type="submit">Send Message</button>
             </form>
+
+            <!-- Contact Details -->
+            <div class="contact-details">
+                <h2>Contact Information</h2>
+                <p><strong>Email:</strong> support@chikaneapp.com</p>
+                <p><strong>Phone:</strong> +1 (123) 456-7890</p>
+                <p><strong>Location:</strong> 1234 Racing Lane, Speed City, USA</p>
+            </div>
         </div>
     </section>
+
+    <!-- Map Section -->
+    <section class="contact-map">
+        <h2>Find Us Here</h2>
+        <div id="map" style="height: 300px;"></div>
+    </section>
+
+    <!-- Leaflet Map Script -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize Leaflet map
+        const map = L.map('map').setView([37.7749, -122.4194], 10); // Centered on San Francisco for demo
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+        }).addTo(map);
+
+        // Add marker
+        L.marker([37.7749, -122.4194]).addTo(map)
+            .bindPopup('Chikane Headquarters')
+            .openPopup();
+    </script>
 
     <!-- Footer -->
     <footer class="footer">
