@@ -127,3 +127,93 @@ body {
 .cta-button:hover {
     background: #FF6533; /* Slightly lighter orange */
 }
+/* Carousel Styling */
+.feature-carousel {
+    text-align: center;
+    padding: 50px 0;
+}
+
+.carousel {
+    position: relative;
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+.carousel-images {
+    display: flex;
+    overflow: hidden;
+}
+
+.carousel-item {
+    display: none;
+    max-width: 100%;
+    transition: opacity 0.5s;
+}
+
+.carousel-item.active {
+    display: block;
+    opacity: 1;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.prev-btn {
+    left: 10px;
+}
+
+.next-btn {
+    right: 10px;
+}
+
+.carousel-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+/* Feature Comparison Table */
+.feature-comparison {
+    padding: 50px 0;
+    text-align: center;
+}
+
+.feature-comparison table {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    border: 1px solid #C0C0C0; /* Silver border */
+}
+
+.feature-comparison th, .feature-comparison td {
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #C0C0C0; /* Silver border */
+}
+
+.feature-comparison th {
+    background-color: #FF4500; /* Bright orange-red */
+    color: white;
+}
+
+.feature-comparison tr:nth-child(even) {
+    background-color: #1A2838; /* Slightly lighter navy */
+}
+
+.feature-comparison tr:nth-child(odd) {
+    background-color: #0A1828; /* Deep navy */
+}
+
+.feature-comparison td {
+    color: #E6F0FF; /* Light blue text */
+}
+
+.feature-comparison td:first-child {
+    font-weight: bold;
+}

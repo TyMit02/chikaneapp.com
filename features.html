@@ -8,33 +8,138 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
+    <nav class="navbar sticky">
         <div class="container">
             <img src="images/logo.png" alt="Chikane Logo" class="logo">
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="features.html">Features</a></li>
-                <li><a href="getting-started.html">Events</a></li>
+                <li><a href="getting-started.html">Getting Started</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Features Section -->
-    <section class="features">
-        <div class="container">
-            <h2>App Features</h2>
-            <div class="feature-item">
-                <h3>Lap Timing</h3>
-                <p>Precision lap timing with real-time updates.</p>
-            </div>
-            <div class="feature-item">
-                <h3>Event Management</h3>
-                <p>Create, manage, and track racing events effortlessly.</p>
-            </div>
-            <!-- Add more features as needed -->
+    <!-- Intro Section -->
+    <section class="features-intro">
+        <h1>Unmatched Precision & Performance</h1>
+        <p>Chikane offers a range of features designed to deliver precision, speed, and efficiency for racers and event organizers.</p>
+    </section>
+
+    <!-- Feature Blocks -->
+    <section class="feature-blocks">
+        <div class="feature-block">
+            <h2>Real-Time Lap Timing</h2>
+            <p>Track laps with millisecond precision and instant updates.</p>
+            <img src="images/lap-timing.png" alt="Real-Time Lap Timing">
         </div>
+        <div class="feature-block">
+            <h2>Event Management</h2>
+            <p>Set up and manage race events seamlessly, from registration to results.</p>
+            <img src="images/event-management.png" alt="Event Management">
+        </div>
+        <div class="feature-block">
+            <h2>Analytics & Reports</h2>
+            <p>Access detailed lap data and performance reports after each event.</p>
+            <img src="images/analytics.png" alt="Analytics & Reports">
+        </div>
+        <div class="feature-block">
+            <h2>Custom Track Database</h2>
+            <p>Choose from a comprehensive list of supported tracks or add your own.</p>
+            <img src="images/tracks.png" alt="Track Database">
+        </div>
+        <div class="feature-block">
+            <h2>Cross-Platform Syncing</h2>
+            <p>Your data is always available, syncing across devices automatically.</p>
+            <img src="images/syncing.png" alt="Cross-Platform Syncing">
+        </div>
+    </section>
+
+   <!-- Feature Carousel -->
+<section class="feature-carousel">
+    <h2>See Chikane in Action</h2>
+    <div class="carousel">
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <div class="carousel-images">
+            <img src="images/chikane-demo-1.png" alt="Chikane Demo 1" class="carousel-item active">
+            <img src="images/chikane-demo-2.png" alt="Chikane Demo 2" class="carousel-item">
+            <img src="images/chikane-demo-3.png" alt="Chikane Demo 3" class="carousel-item">
+        </div>
+        <button class="carousel-btn next-btn">&#10095;</button>
+    </div>
+</section>
+
+<script>
+    // Simple Carousel Functionality
+    const carouselItems = document.querySelectorAll('.carousel-item');
+    const nextBtn = document.querySelector('.next-btn');
+    const prevBtn = document.querySelector('.prev-btn');
+    let currentIndex = 0;
+
+    function updateCarousel() {
+        carouselItems.forEach((item, index) => {
+            item.classList.toggle('active', index === currentIndex);
+        });
+    }
+
+    nextBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % carouselItems.length;
+        updateCarousel();
+    });
+
+    prevBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+        updateCarousel();
+    });
+</script>
+
+
+    <!-- Feature Comparison Table -->
+    <section class="feature-comparison">
+        <h2>Chikane vs. Competitors</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Chikane</th>
+                    <th>Competitor A</th>
+                    <th>Competitor B</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Real-Time Lap Timing</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                </tr>
+                <tr>
+                    <td>Event Management</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                </tr>
+                <tr>
+                    <td>Analytics & Reports</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                    <td>✓</td>
+                </tr>
+                <tr>
+                    <td>Custom Track Database</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                    <td>✗</td>
+                </tr>
+                <tr>
+                    <td>Cross-Platform Syncing</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                    <td>✓</td>
+                </tr>
+            </tbody>
+        </table>
     </section>
 
     <!-- Footer -->
