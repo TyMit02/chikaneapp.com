@@ -102,3 +102,28 @@ body {
     text-align: center;
     color: #C0C0C0; /* Silver text */
 }
+/* Adjust logo styling */
+.logo {
+    width: 100px;
+    margin-right: 20px;
+}
+
+/* Center hero content */
+.hero-content {
+    text-align: center;
+    padding-top: 100px; /* Add some top padding */
+}
+
+.cta-button {
+    margin-top: 20px; /* Add space between text and button */
+    padding: 1rem 2rem;
+    background: #FF4500; /* Accent color */
+    color: #fff;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.cta-button:hover {
+    background: #FF6533; /* Slightly lighter orange */
+}
