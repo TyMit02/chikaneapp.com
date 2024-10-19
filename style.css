@@ -56,7 +56,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 0 2rem;
+    background-attachment: fixed; /* Parallax effect */
 }
 
 .hero-content h1 {
@@ -218,6 +218,12 @@ body {
     background-color: #FF4500; /* Bright orange-red */
 }
 
+/* Getting Started Section */
+.getting-started {
+    padding: 60px 20px;
+    text-align: center;
+}
+
 /* Step-by-Step Guide */
 .getting-started .step {
     margin: 50px 0;
@@ -227,13 +233,28 @@ body {
     text-align: center;
 }
 
-.download-button {
+/* Download Buttons Container */
+.download-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Add spacing between buttons */
     margin-top: 20px;
-    padding: 12px 20px;
+}
+
+.download-button {
+    padding: 15px 30px;
     background-color: #FF4500; /* Accent color */
     color: white;
     text-decoration: none;
     border-radius: 5px;
+    font-size: 1.1rem;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.download-button:hover {
+    background-color: #FF6533; /* Slightly lighter orange */
+    transform: translateY(-3px);
 }
 
 .download-button.disabled {
@@ -498,4 +519,16 @@ body {
     height: 500px;
     border: 3px solid #FF4500; /* Accent border */
     border-radius: 10px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+button, .cta-button, .download-button {
+    transition: background 0.3s, transform 0.2s;
+}
+
+button:hover, .cta-button:hover, .download-button:hover {
+    transform: translateY(-3px);
+    background-color: #FF6533; /* Slightly lighter orange */
 }
