@@ -3,58 +3,102 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Avenir', sans-serif;
 }
 
+/* Body Background */
 body {
-    color: #333;
-    background-color: #f4f4f4;
+    background: #0A1828; /* Deep navy blue */
+    color: #E6F0FF; /* Light blue text */
 }
 
-/* Navbar Styles */
-.navbar {
-    background: #000;
+/* Sticky Navbar */
+.navbar.sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(10, 24, 40, 0.9); /* Slightly transparent */
     padding: 1rem;
 }
 
 .navbar .logo {
-    color: #fff;
-    font-size: 1.5rem;
+    width: 50px;
 }
 
 .navbar .nav-links {
     list-style: none;
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .navbar .nav-links a {
-    color: #fff;
+    color: #E6F0FF; /* Light blue */
     text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar .nav-links a:hover {
+    color: #FF4500; /* Accent color */
+    transition: color 0.3s;
 }
 
 /* Hero Section */
 .hero {
-    background: url('hero-image.jpg') no-repeat center center/cover;
+    background: url('images/hero-bg.jpg') no-repeat center center/cover;
     height: 80vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
     text-align: center;
 }
 
 .hero-content h1 {
     font-size: 3rem;
+    color: #E6F0FF; /* Light blue text */
 }
 
 .hero-content .cta-button {
-    background: #ff4500;
+    background: #FF4500; /* Accent color */
     color: #fff;
     padding: 1rem 2rem;
     text-decoration: none;
-    margin-top: 1rem;
-    display: inline-block;
+    border-radius: 5px;
+    transition: transform 0.2s;
 }
 
-/* Add CSS for other sections similarly */
+.hero-content .cta-button:hover {
+    transform: scale(1.05);
+}
+
+/* Real-Time Stats Bar */
+.stats-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #1A2838; /* Slightly lighter navy */
+    padding: 1rem;
+    color: #C0C0C0; /* Silver */
+}
+
+.stats-item {
+    margin: 0 2rem;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.stats-number {
+    font-size: 2rem;
+    color: #FF4500; /* Accent color */
+}
+
+.stats-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Footer */
+.footer {
+    background: #000;
+    padding: 1rem;
+    text-align: center;
+    color: #C0C0C0; /* Silver text */
+}

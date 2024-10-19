@@ -3,84 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chikane - Precision Lap Timing</title>
+    <title>Chikane - Precision Lap Timer</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Firebase & Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
+            authDomain: "chikane-e5fa1.firebaseapp.com",
+            projectId: "chikane-e5fa1",
+            storageBucket: "chikane-e5fa1.appspot.com",
+            messagingSenderId: "989422231159",
+            appId: "1:989422231159:web:2895f389094dcccb9d3072",
+            measurementId: "G-GX4ZZW6EXK"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+    </script>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="container">
-            <a href="#" class="logo">Chikane</a>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#events">Events</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="#privacy">Privacy Policy</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1>Precision Timing Meets Performance</h1>
-            <p>Track, Time, and Manage Your Events Like Never Before.</p>
-            <a href="#download" class="cta-button">Download Now</a>
-        </div>
+    <!-- Map Section -->
+    <section class="map-section">
+        <h2>Tracks Supported by Chikane</h2>
+        <div id="map" style="height: 500px;"></div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <div class="container">
-            <h2>App Features</h2>
-            <div class="feature-item">
-                <h3>Lap Timing</h3>
-                <p>Record precise lap times with minimal delay, ensuring accurate performance tracking.</p>
-            </div>
-            <div class="feature-item">
-                <h3>Event Management</h3>
-                <p>Create, manage, and join racing events seamlessly through the app.</p>
-            </div>
-            <!-- Add more features as needed -->
-        </div>
-    </section>
+    <script type="module">
+        // Initialize Leaflet map
+        const map = L.map('map').setView([20, 0], 2); // Initial view: World
 
-    <!-- Events Section -->
-    <section id="events" class="events">
-        <div class="container">
-            <h2>Upcoming Events</h2>
-            <!-- Placeholder for event cards -->
-        </div>
-    </section>
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+        }).addTo(map);
 
-    <!-- Contact Page -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2>Contact Us</h2>
-            <form>
-                <input type="text" placeholder="Name" required>
-                <input type="email" placeholder="Email" required>
-                <textarea placeholder="Message" required></textarea>
-                <button type="submit">Send</button>
-            </form>
-        </div>
-    </section>
+        // JSON data from custom_tracks.json
+        const tracks = [
+            {
+                "id": "srw001",
+                "name": "Senior Way Test",
+                "latitude": 32.974202770110104,
+                "longitude": -96.76546303267521
+            },
+            {
+                "id": "mhwk001",
+                "name": "Mohawk test loop",
+                "latitude": 32.97079229056808,
+                "longitude": -96.76073431722033
+            },
+            {
+                "id": "ecr001",
+                "name": "Eagles Canyon Raceway CW",
+                "latitude": 33.383333,
+                "longitude": -97.466667
+            },
+            {
+                "id": "cota001",
+                "name": "Circuit of the Americas",
+                "latitude": 30.1328,
+                "longitude": -97.6411
+            }
+            // Add more tracks from the JSON data
+        ];
 
-    <!-- Privacy Policy Page -->
-    <section id="privacy" class="privacy">
-        <div class="container">
-            <h2>Privacy Policy</h2>
-            <p>Placeholder text for the privacy policy. You can update this later.</p>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Chikane. All rights reserved.</p>
-        </div>
-    </footer>
+        // Add markers to the map
+        tracks.forEach(track => {
+            L.marker([track.latitude, track.longitude])
+                .addTo(map)
+                .bindPopup(`<b>${track.name}</b>`);
+        });
+    </script>
 </body>
 </html>
