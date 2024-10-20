@@ -23,29 +23,18 @@ const realTimeDb = getDatabase(app);
 // Wait for the DOM to load
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("User is logged in:", user.email);
-            loadDashboard(user);
-            setupEventCreation(user);
-        } else {
+        const currentPath = window.location.pathname;
+
+        if (user && currentPath.includes("login.html")) {
+            // If the user is logged in but on the login page, redirect to the dashboard
+            console.log("User is logged in, redirecting to dashboard.");
+            window.location.href = "dashboard.html";
+        } else if (!user && currentPath.includes("dashboard.html")) {
+            // If the user is not logged in but on the dashboard, redirect to the login page
             console.log("User not logged in, redirecting to login.");
             window.location.href = "login.html";
         }
     });
-
-    // Handle Logout
-    const logoutButton = document.getElementById("logout-button");
-    if (logoutButton) {
-        logoutButton.addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                console.log("Logout successful!");
-                window.location.href = "login.html";
-            } catch (error) {
-                console.error("Logout error:", error.message);
-            }
-        });
-    }
 });
 
 // Load dashboard data
