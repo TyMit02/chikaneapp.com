@@ -17,10 +17,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const realTimeDb = getDatabase(app);
 
 // Wait for the DOM to load
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if user is logged in
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("User is logged in:", user.email);
@@ -53,9 +53,7 @@ async function loadDashboard(user) {
         const eventsRef = collection(db, `users/${user.uid}/events`);
         const eventSnapshot = await getDocs(eventsRef);
         const eventContainer = document.getElementById("event-container");
-
-        // Reset container to avoid duplicates
-        eventContainer.innerHTML = "";
+        eventContainer.innerHTML = ''; // Clear existing events
 
         let totalEvents = 0;
         let totalParticipants = 0;
@@ -74,8 +72,8 @@ async function loadDashboard(user) {
                 <h3>${eventData.name}</h3>
                 <p>Date: ${eventData.date}</p>
                 <p>Participants: ${eventData.participants || 0}</p>
-                <button onclick="editEvent('${doc.id}')">Edit</button>
-                <button onclick="deleteEvent('${doc.id}')">Delete</button>
+                <button onclick="editEvent('${doc.id}', '${user.uid}')">Edit</button>
+                <button onclick="deleteEvent('${doc.id}', '${user.uid}')">Delete</button>
             `;
             eventContainer.appendChild(eventCard);
         });
@@ -96,28 +94,23 @@ function setupEventCreation(user) {
         createEventForm.addEventListener("submit", async (event) => {
             event.preventDefault(); // Prevent page refresh
 
-            // Gather form inputs
             const eventName = document.getElementById("event-name").value;
-            const eventDate = new Date(document.getElementById("event-date").value); // Convert to Date object
-            const eventCode = document.getElementById("event-code").value;
-            const trackName = document.getElementById("track-name").value;
-            const trackId = document.getElementById("track-id").value;
-            const organizerId = user.uid;
+            const eventDate = document.getElementById("event-date").value;
+            const eventDescription = document.getElementById("event-description").value;
+            const eventParticipants = parseInt(document.getElementById("event-participants").value, 10);
 
             try {
-                // Add new event to Firestore
-                await addDoc(collection(db, `events`), {
+                await addDoc(collection(db, `users/${user.uid}/events`), {
                     name: eventName,
                     date: eventDate,
-                    eventCode: eventCode,
-                    track: trackName,
-                    trackId: trackId,
-                    organizerId: organizerId,
-                    participants: [] // Start with an empty participant list
+                    description: eventDescription,
+                    participants: eventParticipants,
+                    status: "upcoming"
                 });
                 console.log("Event created successfully!");
                 alert("Event created successfully!");
                 createEventForm.reset();
+                window.location.reload();
             } catch (error) {
                 console.error("Error creating event:", error.message);
                 alert(`Error creating event: ${error.message}`);
@@ -126,11 +119,68 @@ function setupEventCreation(user) {
     }
 }
 
-// Placeholder functions for editing and deleting events
-function editEvent(eventId) {
-    alert(`Edit event: ${eventId}`);
-}
+// Edit event
+window.editEvent = async function(eventId, userId) {
+    const eventRef = doc(db, `users/${userId}/events`, eventId);
+    const eventDoc = await getDocs(eventRef);
 
-function deleteEvent(eventId) {
-    alert(`Delete event: ${eventId}`);
-}
+    if (eventDoc.exists()) {
+        const eventData = eventDoc.data();
+
+        // Prefill the edit form
+        document.getElementById("edit-event-name").value = eventData.name;
+        document.getElementById("edit-event-date").value = eventData.date;
+        document.getElementById("edit-event-description").value = eventData.description;
+        document.getElementById("edit-event-participants").value = eventData.participants || 0;
+
+        // Show the edit form
+        document.getElementById("edit-event-modal").style.display = "block";
+
+        // Handle event update
+        document.getElementById("edit-event-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            try {
+                await updateDoc(eventRef, {
+                    name: document.getElementById("edit-event-name").value,
+                    date: document.getElementById("edit-event-date").value,
+                    description: document.getElementById("edit-event-description").value,
+                    participants: parseInt(document.getElementById("edit-event-participants").value, 10),
+                });
+                console.log("Event updated successfully!");
+                alert("Event updated successfully!");
+                window.location.reload();
+            } catch (error) {
+                console.error("Error updating event:", error.message);
+                alert(`Error updating event: ${error.message}`);
+            }
+        });
+    } else {
+        console.error("No such event found.");
+        alert("No such event found.");
+    }
+};
+
+// Delete event
+window.deleteEvent = async function(eventId, userId) {
+    const eventRef = doc(db, `users/${userId}/events`, eventId);
+
+    if (confirm("Are you sure you want to delete this event?")) {
+        try {
+            await deleteDoc(eventRef);
+            console.log("Event deleted successfully!");
+            alert("Event deleted successfully!");
+            window.location.reload();
+        } catch (error) {
+            console.error("Error deleting event:", error.message);
+            alert(`Error deleting event: ${error.message}`);
+        }
+    }
+};
+
+// Realtime Database Listener for Laps (if applicable)
+const lapsRef = ref(realTimeDb, 'laps');
+onValue(lapsRef, (snapshot) => {
+    const totalLaps = snapshot.val() || 0; // Default to 0 if no data
+    document.querySelector('.stats-number').textContent = totalLaps + '+';
+});
