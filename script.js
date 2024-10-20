@@ -28,7 +28,7 @@ const db = getFirestore(app);
 
 // Handle login
 document.getElementById("login-form").addEventListener("submit", function(event) {
-    event.preventDefault();
+    event.preventDefault();  // Prevent default form submission
 
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
@@ -40,18 +40,14 @@ document.getElementById("login-form").addEventListener("submit", function(event)
         })
         .catch((error) => {
             // Handle errors
-            const errorCode = error.code;
-            const errorMessage = error.message;
             document.getElementById("login-error").style.display = "block";
-            document.getElementById("login-error").textContent = errorMessage;
+            document.getElementById("login-error").textContent = error.message;
         });
 });
 
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
-
 // Handle registration
 document.getElementById("register-form").addEventListener("submit", function(event) {
-    event.preventDefault();
+    event.preventDefault();  // Prevent default form submission
 
     const email = document.getElementById("register-email").value;
     const password = document.getElementById("register-password").value;
@@ -63,33 +59,7 @@ document.getElementById("register-form").addEventListener("submit", function(eve
         })
         .catch((error) => {
             // Handle errors
-            const errorCode = error.code;
-            const errorMessage = error.message;
             document.getElementById("register-error").style.display = "block";
-            document.getElementById("register-error").textContent = errorMessage;
+            document.getElementById("register-error").textContent = error.message;
         });
-});
-
-import { addDoc, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
-
-// Handle event creation
-document.getElementById("create-event-form").addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const eventName = document.getElementById("event-name").value;
-    const eventDate = document.getElementById("event-date").value;
-    const eventDescription = document.getElementById("event-description").value;
-
-    addDoc(collection(db, "events"), {
-        name: eventName,
-        date: eventDate,
-        description: eventDescription
-    })
-    .then(() => {
-        alert("Event created successfully!");
-        document.getElementById("create-event-form").reset();
-    })
-    .catch((error) => {
-        console.error("Error creating event: ", error);
-    });
 });
