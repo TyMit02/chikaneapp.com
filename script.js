@@ -21,22 +21,38 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const rtdb = getDatabase(app);
 
-// Wait for the DOM to load
+// Ensure the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if user is logged in
+    // Handle user authentication state
     onAuthStateChanged(auth, (user) => {
+        const dashboardPage = document.querySelector('.dashboard');
+        const loginPage = document.querySelector('.login-section');
+
         if (user) {
             console.log("User is logged in:", user.email);
-            loadDashboard(user);
-            setupEventCreation(user);
-            loadRealTimeData(); // Fetch real-time data from Realtime Database
+
+            // If on login page, redirect to dashboard
+            if (loginPage) {
+                window.location.href = "dashboard.html";
+            }
+
+            // Load dashboard data if on dashboard page
+            if (dashboardPage) {
+                loadDashboard(user);
+                setupEventCreation(user);
+                loadRealTimeData();
+            }
         } else {
-            console.log("User not logged in, redirecting to login.");
-            window.location.href = "login.html";
+            console.log("User not logged in");
+
+            // Redirect only if not on the login page
+            if (dashboardPage) {
+                window.location.href = "login.html";
+            }
         }
     });
 
-    // Handle Logout
+    // Handle logout
     const logoutButton = document.getElementById("logout-button");
     if (logoutButton) {
         logoutButton.addEventListener("click", async () => {
