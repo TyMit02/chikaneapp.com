@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chikane - Event Organizer Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar sticky">
+        <div class="container">
+            <img src="images/logo.png" alt="Chikane Logo" class="logo">
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="create-event.html">Create Event</a></li>
+                <li><a href="manage-events.html">Manage Events</a></li>
+                <li><a href="reports.html">Reports</a></li>
+                <li><a href="index.html">Log Out</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Dashboard Overview -->
+    <section class="dashboard">
+        <h1>Welcome, Event Organizer!</h1>
+        <p>Here you can manage events, view participants, analyze reports, and more.</p>
+
+        <!-- Dashboard Features -->
+        <div class="dashboard-features">
+            <a href="create-event.html" class="dashboard-link">Create New Event</a>
+            <a href="manage-events.html" class="dashboard-link">Manage Existing Events</a>
+            <a href="reports.html" class="dashboard-link">View Event Reports</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Chikane. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JS Script -->
+    <script src="script.js"></script>
+</body>
+</html>
+
+<script type="module">
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+
+    const auth = getAuth();
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            // User not logged in, redirect to login page
+            window.location.href = "login.html";
+        }
+    });
+</script>
+
+<section class="create-event">
+    <h2>Create New Event</h2>
+    <form id="create-event-form">
+        <input type="text" id="event-name" placeholder="Event Name" required>
+        <input type="date" id="event-date" required>
+        <textarea id="event-description" placeholder="Event Description"></textarea>
+        <button type="submit" class="create-event-button">Create Event</button>
+    </form>
+</section>
