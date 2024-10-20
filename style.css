@@ -557,97 +557,73 @@ button:hover, .cta-button:hover, .download-button:hover {
 }
 
 /* Privacy Policy Section */
+/* Privacy Policy Section */
 .privacy-policy {
     padding: 60px 20px;
-    max-width: 1000px;
+    max-width: 1200px; /* Increase max width */
     margin: 0 auto;
     background-color: #0A1828; /* Deep navy */
     color: #E6F0FF; /* Light blue text */
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Add a subtle shadow */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Header Styles */
-.privacy-policy h1 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: #FF4500; /* Accent color */
-    text-align: center;
-    border-bottom: 2px solid #FF4500; /* Underline with accent color */
-    padding-bottom: 10px;
-}
-
-.privacy-policy h2 {
-    font-size: 2rem;
-    margin-top: 30px;
-    margin-bottom: 15px;
-    color: #FF4500; /* Accent color */
-}
-
-.privacy-policy p {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 20px;
+/* Add responsive layout for wider screens */
+@media (min-width: 1024px) {
+    .privacy-policy {
+        padding: 40px 40px;
+        max-width: 90%; /* Make it take up more space */
+    }
 }
 
 /* Table of Contents Styling */
-.toc {
-    margin-bottom: 40px;
-}
-
-.toc h2 {
-    font-size: 2rem;
-    margin-bottom: 10px;
-    color: #FF4500; /* Accent color */
-}
-
 .toc ul {
     list-style-type: none;
     padding-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center TOC */
+    gap: 20px;
 }
 
 .toc li {
-    margin-bottom: 10px;
+    margin: 0;
 }
 
 .toc a {
     color: #FF4500; /* Accent color */
     text-decoration: none;
     font-weight: bold;
+    padding: 8px 12px;
+    border: 1px solid #FF4500;
+    border-radius: 5px;
+    transition: background 0.3s;
 }
 
 .toc a:hover {
-    text-decoration: underline;
+    background: rgba(255, 69, 0, 0.2); /* Light orange hover effect */
 }
 
-/* Section Dividers */
+/* Add padding and center-align content */
+.privacy-policy h2 {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    color: #FF4500; /* Accent color */
+    text-align: center; /* Center align headers */
+}
+
+.privacy-policy p, .privacy-policy ul {
+    text-align: left; /* Align text left for readability */
+    margin-bottom: 20px;
+}
+
+.privacy-policy ul {
+    margin-left: 20px;
+}
+
 .section-divider {
     margin: 40px 0;
     height: 2px;
-    background-color: #FF4500; /* Accent color */
+    background-color: #FF4500;
     opacity: 0.5;
-}
-
-/* Highlight Important Text */
-.privacy-policy .highlight {
-    background-color: rgba(255, 69, 0, 0.1); /* Light orange background */
-    padding: 5px;
-    border-radius: 5px;
-}
-
-/* Two-Column Layout for Wide Screens */
-@media (min-width: 1024px) {
-    .privacy-policy {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
-    }
-
-    .privacy-policy h1 {
-        grid-column: 1 / span 2;
-    }
-
-    .privacy-policy p, .privacy-policy h2 {
-        grid-column: 1 / span 2;
-    }
 }
