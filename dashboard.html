@@ -12,10 +12,6 @@
         <div class="container">
             <img src="images/logo.png" alt="Chikane Logo" class="logo">
             <ul class="nav-links">
-                <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="create-event.html">Create Event</a></li>
-                <li><a href="manage-events.html">Manage Events</a></li>
-                <li><a href="reports.html">Reports</a></li>
                 <li><a href="#" id="logout-button">Log Out</a></li>
             </ul>
         </div>
@@ -24,20 +20,15 @@
     <!-- Dashboard Overview -->
     <section class="dashboard">
         <h1>Welcome, Event Organizer!</h1>
-        <p>Manage events, view participants, analyze reports, and more.</p>
-        <div class="dashboard-features">
-            <a href="create-event.html" class="dashboard-link">Create New Event</a>
-            <a href="manage-events.html" class="dashboard-link">Manage Existing Events</a>
-            <a href="reports.html" class="dashboard-link">View Event Reports</a>
-        </div>
+        <p>Manage events, view participants, and more.</p>
     </section>
 
     <!-- JS Script -->
     <script type="module">
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
-
+        
         const auth = getAuth();
-
+        
         // Ensure user is logged in
         onAuthStateChanged(auth, (user) => {
             if (!user) {
@@ -46,12 +37,9 @@
         });
 
         // Handle logout
-        document.getElementById("logout-button").addEventListener("click", (event) => {
-            event.preventDefault();
+        document.getElementById("logout-button").addEventListener("click", () => {
             signOut(auth).then(() => {
                 window.location.href = "login.html";
-            }).catch((error) => {
-                console.error("Error logging out: ", error);
             });
         });
     </script>

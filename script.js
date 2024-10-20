@@ -8,41 +8,39 @@ lapsRef.on('value', (snapshot) => {
 });
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 
-// Firebase Configuration
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID",
-    measurementId: "YOUR_MEASUREMENT_ID"
-};
-
-// Initialize Firebase
+// Firebase Config
+const firebaseConfig = { /* Your Firebase Config Here */ };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Registration
+// Registration Handler
 document.getElementById("register-form").addEventListener("submit", (event) => {
     event.preventDefault();
     const email = document.getElementById("register-email").value;
     const password = document.getElementById("register-password").value;
+    const plan = document.getElementById("plan").value;
 
-    createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-            window.location.href = "dashboard.html";
-        })
-        .catch((error) => {
-            document.getElementById("register-error").textContent = error.message;
-            document.getElementById("register-error").style.display = "block";
-        });
+    // Stripe Integration
+    fetch('/create-checkout-session', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ plan, email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        window.location.href = data.url; // Redirect to Stripe checkout
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById("register-error").textContent = error.message;
+    });
 });
 
-// Login
+// Login Handler
 document.getElementById("login-form").addEventListener("submit", (event) => {
     event.preventDefault();
     const email = document.getElementById("email").value;
@@ -54,25 +52,5 @@ document.getElementById("login-form").addEventListener("submit", (event) => {
         })
         .catch((error) => {
             document.getElementById("login-error").textContent = error.message;
-            document.getElementById("login-error").style.display = "block";
-        });
-});
-
-// Handle registration
-document.getElementById("register-form").addEventListener("submit", function(event) {
-    event.preventDefault();  // Prevent default form submission
-
-    const email = document.getElementById("register-email").value;
-    const password = document.getElementById("register-password").value;
-
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // Successful registration
-            window.location.href = "dashboard.html";
-        })
-        .catch((error) => {
-            // Handle errors
-            document.getElementById("register-error").style.display = "block";
-            document.getElementById("register-error").textContent = error.message;
         });
 });

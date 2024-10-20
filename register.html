@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chikane - Event Organizer Registration</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -22,21 +23,20 @@
     <section class="register-section">
         <div class="register-container">
             <h1>Event Organizer Registration</h1>
-            <form id="register-form" onsubmit="return false;">
+            <form id="register-form">
                 <input type="email" id="register-email" placeholder="Email" required>
                 <input type="password" id="register-password" placeholder="Password" required>
+                <select id="plan" required>
+                    <option value="">Choose Your Plan</option>
+                    <option value="basic">Basic ($100/month)</option>
+                    <option value="standard">Standard ($200/month)</option>
+                    <option value="premium">Premium ($300/month)</option>
+                </select>
                 <button type="submit" class="register-button">Sign Up</button>
             </form>
             <p id="register-error" style="color: red; display: none;"></p>
         </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Chikane. All rights reserved.</p>
-        </div>
-    </footer>
 
     <!-- JS Script -->
     <script src="script.js" type="module"></script>
