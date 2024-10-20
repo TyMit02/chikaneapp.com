@@ -16,7 +16,7 @@
                 <li><a href="create-event.html">Create Event</a></li>
                 <li><a href="manage-events.html">Manage Events</a></li>
                 <li><a href="reports.html">Reports</a></li>
-                <li><a href="index.html" id="logout-button">Log Out</a></li>
+                <li><a href="#" id="logout-button">Log Out</a></li>
             </ul>
         </div>
     </nav>
@@ -24,9 +24,7 @@
     <!-- Dashboard Overview -->
     <section class="dashboard">
         <h1>Welcome, Event Organizer!</h1>
-        <p>Here you can manage events, view participants, analyze reports, and more.</p>
-
-        <!-- Dashboard Features -->
+        <p>Manage events, view participants, analyze reports, and more.</p>
         <div class="dashboard-features">
             <a href="create-event.html" class="dashboard-link">Create New Event</a>
             <a href="manage-events.html" class="dashboard-link">Manage Existing Events</a>
@@ -34,23 +32,15 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Chikane. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- JS Script for Authentication -->
+    <!-- JS Script -->
     <script type="module">
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 
         const auth = getAuth();
 
-        // Restrict access to dashboard
+        // Ensure user is logged in
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                // If the user is not logged in, redirect to the login page
                 window.location.href = "login.html";
             }
         });
@@ -67,13 +57,3 @@
     </script>
 </body>
 </html>
-
-<section class="create-event">
-    <h2>Create New Event</h2>
-    <form id="create-event-form">
-        <input type="text" id="event-name" placeholder="Event Name" required>
-        <input type="date" id="event-date" required>
-        <textarea id="event-description" placeholder="Event Description"></textarea>
-        <button type="submit" class="create-event-button">Create Event</button>
-    </form>
-</section>
