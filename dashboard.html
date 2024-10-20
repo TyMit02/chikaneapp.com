@@ -20,28 +20,34 @@
     <!-- Dashboard Overview -->
     <section class="dashboard">
         <h1>Welcome, Event Organizer!</h1>
+        <div class="dashboard-cards">
+            <!-- Event Summary Cards -->
+            <div class="dashboard-card">
+                <h2>Total Events</h2>
+                <p id="total-events">0</p>
+            </div>
+            <div class="dashboard-card">
+                <h2>Total Participants</h2>
+                <p id="total-participants">0</p>
+            </div>
+            <div class="dashboard-card">
+                <h2>Completed Sessions</h2>
+                <p id="completed-sessions">0</p>
+            </div>
+        </div>
         <p>Manage events, view participants, and more.</p>
+
+        <!-- Dynamic Event List -->
+        <div class="event-list">
+            <h2>Your Events</h2>
+            <div id="event-container">
+                <!-- Event cards will be dynamically populated here -->
+            </div>
+        </div>
+        <button id="create-event-button" class="dashboard-link">Create New Event</button>
     </section>
 
     <!-- JS Script -->
-    <script type="module">
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
-        
-        const auth = getAuth();
-        
-        // Ensure user is logged in
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = "login.html";
-            }
-        });
-
-        // Handle logout
-        document.getElementById("logout-button").addEventListener("click", () => {
-            signOut(auth).then(() => {
-                window.location.href = "login.html";
-            });
-        });
-    </script>
+    <script src="script.js" type="module"></script>
 </body>
 </html>
