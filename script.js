@@ -8,7 +8,7 @@ lapsRef.on('value', (snapshot) => {
 });
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -26,51 +26,45 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Firebase app initialized:", app);
-
-    // Registration
+    // Handle Registration
     const registerForm = document.getElementById("register-form");
     if (registerForm) {
-        registerForm.addEventListener("submit", (event) => {
+        registerForm.addEventListener("submit", async (event) => {
             event.preventDefault();
             const email = document.getElementById("register-email").value;
             const password = document.getElementById("register-password").value;
-            console.log("Attempting to register with:", email);
 
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    console.log("Registration successful:", userCredential.user);
-                    window.location.href = "dashboard.html";
-                })
-                .catch((error) => {
-                    console.error("Registration error:", error.message);
-                    alert(`Registration error: ${error.message}`);
-                });
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                console.log("Registration successful:", userCredential.user);
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                console.error("Registration error:", error.message);
+                alert(`Registration error: ${error.message}`);
+            }
         });
     }
 
-    // Login
+    // Handle Login
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
-        loginForm.addEventListener("submit", (event) => {
+        loginForm.addEventListener("submit", async (event) => {
             event.preventDefault();
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
-            console.log("Attempting to log in with:", email);
 
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    console.log("Login successful:", userCredential.user);
-                    window.location.href = "dashboard.html";
-                })
-                .catch((error) => {
-                    console.error("Login error:", error.message);
-                    alert(`Login error: ${error.message}`);
-                });
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                console.log("Login successful:", userCredential.user);
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                console.error("Login error:", error.message);
+                alert(`Login error: ${error.message}`);
+            }
         });
     }
 
-    // Dashboard access
+    // Check Dashboard Access
     const dashboardPage = document.querySelector('.dashboard');
     if (dashboardPage) {
         onAuthStateChanged(auth, (user) => {
@@ -79,6 +73,20 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 console.log("User not logged in, redirecting to login.");
                 window.location.href = "login.html";
+            }
+        });
+    }
+
+    // Handle Logout
+    const logoutButton = document.getElementById("logout-button");
+    if (logoutButton) {
+        logoutButton.addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                console.log("Logout successful!");
+                window.location.href = "login.html";
+            } catch (error) {
+                console.error("Logout error:", error.message);
             }
         });
     }
