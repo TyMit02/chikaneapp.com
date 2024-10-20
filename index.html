@@ -16,21 +16,26 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js";
 
-        // Your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
-            authDomain: "chikane-e5fa1.firebaseapp.com",
-            projectId: "chikane-e5fa1",
-            storageBucket: "chikane-e5fa1.appspot.com",
-            messagingSenderId: "989422231159",
-            appId: "1:989422231159:web:2895f389094dcccb9d3072",
-            measurementId: "G-GX4ZZW6EXK"
-        };
+       // Import the functions you need from the Firebase SDKs
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics.js";
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const database = getDatabase(app);
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
+  authDomain: "chikane-e5fa1.firebaseapp.com",
+  projectId: "chikane-e5fa1",
+  storageBucket: "chikane-e5fa1.appspot.com",
+  messagingSenderId: "989422231159",
+  appId: "1:989422231159:web:2895f389094dcccb9d3072",
+  measurementId: "G-GX4ZZW6EXK"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app); // Initialize Firebase Auth
+const analytics = getAnalytics(app);
 
         // Fetch real-time laps data
         window.addEventListener('DOMContentLoaded', () => {
