@@ -12,6 +12,7 @@
         <div class="container">
             <img src="images/logo.png" alt="Chikane Logo" class="logo">
             <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
                 <li><a href="#" id="logout-button">Log Out</a></li>
             </ul>
         </div>
@@ -20,32 +21,52 @@
     <!-- Dashboard Overview -->
     <section class="dashboard">
         <h1>Welcome, Event Organizer!</h1>
-        <div class="dashboard-cards">
-            <!-- Event Summary Cards -->
-            <div class="dashboard-card">
-                <h2>Total Events</h2>
+        <p>Manage events, view participants, and analyze performance.</p>
+
+        <!-- Dashboard Summary -->
+        <div class="dashboard-summary">
+            <div class="summary-card">
+                <h3>Total Events</h3>
                 <p id="total-events">0</p>
             </div>
-            <div class="dashboard-card">
-                <h2>Total Participants</h2>
+            <div class="summary-card">
+                <h3>Total Participants</h3>
                 <p id="total-participants">0</p>
             </div>
-            <div class="dashboard-card">
-                <h2>Completed Sessions</h2>
+            <div class="summary-card">
+                <h3>Completed Sessions</h3>
                 <p id="completed-sessions">0</p>
             </div>
         </div>
-        <p>Manage events, view participants, and more.</p>
-
-        <!-- Dynamic Event List -->
-        <div class="event-list">
-            <h2>Your Events</h2>
-            <div id="event-container">
-                <!-- Event cards will be dynamically populated here -->
-            </div>
-        </div>
-        <button id="create-event-button" class="dashboard-link">Create New Event</button>
     </section>
+
+    <section class="create-event">
+        <h2>Create New Event</h2>
+        <form id="create-event-form">
+            <input type="text" id="event-name" placeholder="Event Name" required>
+            <input type="date" id="event-date" required>
+            <input type="text" id="event-code" placeholder="Event Code" required>
+            <input type="text" id="track-name" placeholder="Track Name" required>
+            <input type="text" id="track-id" placeholder="Track ID" required>
+            <input type="text" id="organizer-id" placeholder="Organizer ID" required readonly>
+            <button type="submit" class="create-event-button">Create Event</button>
+        </form>
+    </section>
+
+    <!-- Event List Section -->
+    <section class="event-list">
+        <h2>Your Events</h2>
+        <div id="event-container" class="event-container">
+            <!-- Event cards will be dynamically added here -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Chikane. All rights reserved.</p>
+        </div>
+    </footer>
 
     <!-- JS Script -->
     <script src="script.js" type="module"></script>

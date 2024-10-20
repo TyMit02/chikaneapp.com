@@ -96,24 +96,28 @@ function setupEventCreation(user) {
         createEventForm.addEventListener("submit", async (event) => {
             event.preventDefault(); // Prevent page refresh
 
+            // Gather form inputs
             const eventName = document.getElementById("event-name").value;
-            const eventDate = document.getElementById("event-date").value;
-            const eventDescription = document.getElementById("event-description").value;
-            const eventParticipants = parseInt(document.getElementById("event-participants").value, 10) || 0;
+            const eventDate = new Date(document.getElementById("event-date").value); // Convert to Date object
+            const eventCode = document.getElementById("event-code").value;
+            const trackName = document.getElementById("track-name").value;
+            const trackId = document.getElementById("track-id").value;
+            const organizerId = user.uid;
 
             try {
                 // Add new event to Firestore
-                await addDoc(collection(db, `users/${user.uid}/events`), {
+                await addDoc(collection(db, `events`), {
                     name: eventName,
                     date: eventDate,
-                    description: eventDescription,
-                    participants: eventParticipants,
-                    status: "upcoming"
+                    eventCode: eventCode,
+                    track: trackName,
+                    trackId: trackId,
+                    organizerId: organizerId,
+                    participants: [] // Start with an empty participant list
                 });
                 console.log("Event created successfully!");
                 alert("Event created successfully!");
                 createEventForm.reset();
-                loadDashboard(user); // Refresh dashboard
             } catch (error) {
                 console.error("Error creating event:", error.message);
                 alert(`Error creating event: ${error.message}`);
