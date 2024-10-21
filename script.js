@@ -17,13 +17,51 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 const rtdb = getDatabase(app);
 
 // Ensure the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Handle user authentication state
+    // Handle registration form
+    const registerForm = document.getElementById("register-form");
+    if (registerForm) {
+        registerForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const email = document.getElementById("register-email").value;
+            const password = document.getElementById("register-password").value;
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                console.log("Registration successful:", userCredential.user);
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                console.error("Registration error:", error.message);
+                alert(`Registration error: ${error.message}`);
+            }
+        });
+    }
+
+    // Handle login form
+    const loginForm = document.getElementById("login-form");
+    if (loginForm) {
+        loginForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                console.log("Login successful:", userCredential.user);
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                console.error("Login error:", error.message);
+                alert(`Login error: ${error.message}`);
+            }
+        });
+    }
+
+    // Handle auth state change
     onAuthStateChanged(auth, (user) => {
         const dashboardPage = document.querySelector('.dashboard');
         const loginPage = document.querySelector('.login-section');
@@ -31,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             console.log("User is logged in:", user.email);
 
-            // If on login page, redirect to dashboard
+            // Redirect to dashboard if on login page
             if (loginPage) {
                 window.location.href = "dashboard.html";
             }
@@ -45,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             console.log("User not logged in");
 
-            // Redirect only if not on the login page
+            // Redirect to login only if on dashboard
             if (dashboardPage) {
                 window.location.href = "login.html";
             }
@@ -69,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Load real-time laps data from Firebase Realtime Database
 function loadRealTimeData() {
-    const lapsRef = ref(rtdb, 'laps'); // Reference to 'laps' in Realtime Database
+    const lapsRef = ref(rtdb, 'laps');
 
     onValue(lapsRef, (snapshot) => {
         const totalLaps = snapshot.val() || 0;
@@ -83,15 +121,9 @@ async function loadDashboard(user) {
         const eventsRef = collection(db, `users/${user.uid}/events`);
         const eventSnapshot = await getDocs(eventsRef);
         const eventContainer = document.getElementById("event-container");
-        let totalEvents = 0;
-        let totalParticipants = 0;
-        let completedSessions = 0;
 
         eventSnapshot.forEach((doc) => {
-            totalEvents++;
             const eventData = doc.data();
-            totalParticipants += eventData.participants || 0;
-            if (eventData.status === "completed") completedSessions++;
 
             // Create event card
             const eventCard = document.createElement("div");
@@ -100,16 +132,9 @@ async function loadDashboard(user) {
                 <h3>${eventData.name}</h3>
                 <p>Date: ${eventData.date}</p>
                 <p>Participants: ${eventData.participants || 0}</p>
-                <button onclick="editEvent('${doc.id}')">Edit</button>
-                <button onclick="deleteEvent('${doc.id}')">Delete</button>
             `;
             eventContainer.appendChild(eventCard);
         });
-
-        // Update dashboard summary
-        document.getElementById("total-events").textContent = totalEvents;
-        document.getElementById("total-participants").textContent = totalParticipants;
-        document.getElementById("completed-sessions").textContent = completedSessions;
     } catch (error) {
         console.error("Error loading dashboard:", error.message);
     }
@@ -120,20 +145,17 @@ function setupEventCreation(user) {
     const createEventForm = document.getElementById("create-event-form");
     if (createEventForm) {
         createEventForm.addEventListener("submit", async (event) => {
-            event.preventDefault(); // Prevent page refresh
+            event.preventDefault();
 
             const eventName = document.getElementById("event-name").value;
             const eventDate = document.getElementById("event-date").value;
             const eventDescription = document.getElementById("event-description").value;
-            const eventParticipants = parseInt(document.getElementById("event-participants").value, 10);
 
             try {
-                // Add new event to Firestore
                 await addDoc(collection(db, `users/${user.uid}/events`), {
                     name: eventName,
                     date: eventDate,
                     description: eventDescription,
-                    participants: eventParticipants,
                     status: "upcoming"
                 });
                 console.log("Event created successfully!");
@@ -146,13 +168,4 @@ function setupEventCreation(user) {
             }
         });
     }
-}
-
-// Placeholder functions for editing and deleting events
-function editEvent(eventId) {
-    alert(`Edit event: ${eventId}`);
-}
-
-function deleteEvent(eventId) {
-    alert(`Delete event: ${eventId}`);
 }
