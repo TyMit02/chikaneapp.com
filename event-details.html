@@ -12,23 +12,70 @@
         <div class="container">
             <img src="images/logo.png" alt="Chikane Logo" class="logo">
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="dashboard.html">Back to Dashboard</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="#" id="logout-button">Log Out</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Event Details Section -->
+    <!-- Event Details Page -->
     <section class="event-details">
         <h1 id="event-name">Event Name</h1>
-        <p id="event-date">Date: </p>
-        <p id="event-description">Description: </p>
-        <h2>Participants</h2>
-        <div id="participants-container" class="participants-container">
-            <!-- Participants will be dynamically added here -->
+        <p id="event-date">Event Date: </p>
+        <p id="event-code">Event Code: </p>
+        <p id="track-name">Track: </p>
+
+        <!-- Card Layout for Participants, Details, Schedule -->
+        <div class="card-container">
+            <!-- Participants Card -->
+            <div class="card" id="participants-card">
+                <h2>Participants</h2>
+                <div id="participants-list">
+                    <!-- Participants will be listed here -->
+                </div>
+                <button id="add-participant-button">Add Participant</button>
+            </div>
+
+            <!-- Details Card -->
+            <div class="card" id="details-card">
+                <h2>Event Details</h2>
+                <p><strong>Organizer:</strong> <span id="organizer-id"></span></p>
+                <p><strong>Status:</strong> <span id="event-status"></span></p>
+                <button id="edit-details-button">Edit Details</button>
+            </div>
+
+            <!-- Schedule Card -->
+            <div class="card" id="schedule-card">
+                <h2>Schedule</h2>
+                <div id="schedule-list">
+                    <!-- Schedule items will be listed here -->
+                </div>
+                <button id="add-schedule-item-button">Add Schedule Item</button>
+            </div>
         </div>
     </section>
+
+    <!-- Modal for Adding Participants -->
+    <div class="modal" id="add-participant-modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Add Participant</h2>
+            <input type="text" id="participant-name" placeholder="Participant Name" required>
+            <input type="text" id="participant-id" placeholder="Participant ID" required>
+            <button id="save-participant-button">Save</button>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Schedule Items -->
+    <div class="modal" id="add-schedule-item-modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Add Schedule Item</h2>
+            <input type="text" id="schedule-item-name" placeholder="Item Name" required>
+            <input type="datetime-local" id="schedule-item-time" required>
+            <button id="save-schedule-item-button">Save</button>
+        </div>
+    </div>
 
     <!-- JS Script -->
     <script src="script.js" type="module"></script>
