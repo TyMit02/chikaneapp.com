@@ -902,3 +902,84 @@ button:hover, .cta-button:hover, .download-button:hover {
     background: #FF6533; /* Slightly lighter orange */
     transform: translateY(-3px);
 }
+
+/* General Card Container */
+.card-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Individual Cards */
+.card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.card h2 {
+    margin-bottom: 15px;
+}
+
+.card p {
+    margin: 5px 0;
+}
+
+/* Participants List */
+#participants-list div {
+    margin-bottom: 10px;
+}
+
+/* Modals */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 8px;
+}
+
+.close-button {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Summary Cards */
+.dashboard-summary {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.summary-card {
+    padding: 20px;
+    border-radius: 8px;
+    width: 200px;
+    background-color: #f8f8f8;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.summary-card h3 {
+    margin-bottom: 10px;
+}
