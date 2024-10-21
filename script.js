@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -18,111 +18,117 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Load event details when the page is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    const eventId = new URLSearchParams(window.location.search).get('eventId');
-    loadEventDetails(eventId);
-    setupEventModals();
-    handleLogout();
-});
+    const createEventForm = document.getElementById("create-event-form");
 
-// Load event details from Firestore
-async function loadEventDetails(eventId) {
-    if (!eventId) return;
-    
-    try {
-        const eventDoc = await getDoc(doc(db, "events", eventId));
-        if (!eventDoc.exists()) {
-            console.error("Event not found");
-            return;
+    // Ensure that the form element exists
+    if (createEventForm) {
+        console.log("Create Event form found!");
+        setupEventModals(auth);
+    } else {
+        console.error("Create Event form not found!");
+    }
+
+    // Check if user is logged in
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("User is logged in:", user.email);
+            loadDashboard(user);
+        } else {
+            console.log("User not logged in, redirecting to login.");
+            window.location.href = "login.html";
         }
-
-        const eventData = eventDoc.data();
-        document.getElementById("event-name").textContent = eventData.name;
-        document.getElementById("event-date").textContent = `Event Date: ${eventData.date}`;
-        document.getElementById("event-code").textContent = `Event Code: ${eventData.eventCode}`;
-        document.getElementById("track-name").textContent = `Track: ${eventData.track}`;
-
-        loadParticipants(eventId);
-        loadSchedule(eventId);
-    } catch (error) {
-        console.error("Error loading event details:", error.message);
-    }
-}
-
-// Load participants from Firestore
-async function loadParticipants(eventId) {
-    try {
-        const participantsRef = collection(db, `events/${eventId}/participants`);
-        const participantsSnapshot = await getDocs(participantsRef);
-        const participantsList = document.getElementById("participants-list");
-        participantsList.innerHTML = "";
-
-        participantsSnapshot.forEach((doc) => {
-            const participant = doc.data();
-            const participantItem = document.createElement("div");
-            participantItem.textContent = participant.name;
-            participantsList.appendChild(participantItem);
-        });
-    } catch (error) {
-        console.error("Error loading participants:", error.message);
-    }
-}
-
-// Load schedule from Firestore
-async function loadSchedule(eventId) {
-    try {
-        const scheduleRef = collection(db, `events/${eventId}/schedule`);
-        const scheduleSnapshot = await getDocs(scheduleRef);
-        const scheduleList = document.getElementById("schedule-list");
-        scheduleList.innerHTML = "";
-
-        scheduleSnapshot.forEach((doc) => {
-            const scheduleItem = doc.data();
-            const scheduleElement = document.createElement("div");
-            scheduleElement.textContent = `${scheduleItem.name} at ${scheduleItem.time}`;
-            scheduleList.appendChild(scheduleElement);
-        });
-    } catch (error) {
-        console.error("Error loading schedule:", error.message);
-    }
-}
-
-// Setup modals for adding participants and schedule items
-function setupEventModals() {
-    const addParticipantButton = document.getElementById("add-participant-button");
-    const addScheduleItemButton = document.getElementById("add-schedule-item-button");
-    const addParticipantModal = document.getElementById("add-participant-modal");
-    const addScheduleItemModal = document.getElementById("add-schedule-item-modal");
-
-    addParticipantButton.addEventListener("click", () => {
-        addParticipantModal.style.display = "block";
     });
 
-    addScheduleItemButton.addEventListener("click", () => {
-        addScheduleItemModal.style.display = "block";
-    });
-
-    const closeButtons = document.querySelectorAll(".close-button");
-    closeButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            addParticipantModal.style.display = "none";
-            addScheduleItemModal.style.display = "none";
-        });
-    });
-}
-
-// Handle user logout
-function handleLogout() {
+    // Handle Logout
     const logoutButton = document.getElementById("logout-button");
     if (logoutButton) {
         logoutButton.addEventListener("click", async () => {
             try {
                 await signOut(auth);
+                console.log("Logout successful!");
                 window.location.href = "login.html";
             } catch (error) {
                 console.error("Logout error:", error.message);
             }
         });
     }
+});
+
+// Load dashboard data
+async function loadDashboard(user) {
+    try {
+        const eventsRef = collection(db, `users/${user.uid}/events`);
+        const eventSnapshot = await getDocs(eventsRef);
+        const eventContainer = document.getElementById("event-container");
+        eventContainer.innerHTML = ""; // Clear container before adding new events
+        let totalEvents = 0;
+
+        eventSnapshot.forEach((doc) => {
+            totalEvents++;
+            const eventData = doc.data();
+            createEventCard(doc.id, eventData);
+        });
+
+        // Update dashboard summary
+        document.getElementById("total-events").textContent = totalEvents;
+    } catch (error) {
+        console.error("Error loading dashboard:", error.message);
+    }
+}
+
+// Create event card
+function createEventCard(eventId, eventData) {
+    const eventContainer = document.getElementById("event-container");
+    const eventCard = document.createElement("div");
+    eventCard.classList.add("event-card");
+    eventCard.innerHTML = `
+        <h3>${eventData.name}</h3>
+        <p>Date: ${eventData.date}</p>
+        <button onclick="viewEventDetails('${eventId}')">View Details</button>
+    `;
+    eventContainer.appendChild(eventCard);
+}
+
+// Set up event modals
+function setupEventModals(auth) {
+    const createEventForm = document.getElementById("create-event-form");
+    if (createEventForm) {
+        createEventForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const eventName = document.getElementById("event-name").value;
+            const eventDate = document.getElementById("event-date").value;
+            const eventCode = document.getElementById("event-code").value;
+            const trackName = document.getElementById("track-name").value;
+            const trackId = document.getElementById("track-id").value;
+            const user = auth.currentUser;
+
+            try {
+                // Add new event to Firestore
+                await addDoc(collection(db, `users/${user.uid}/events`), {
+                    name: eventName,
+                    date: eventDate,
+                    eventCode: eventCode,
+                    track: trackName,
+                    trackId: trackId,
+                    organizerId: user.uid,
+                    participants: []
+                });
+
+                console.log("Event created successfully!");
+                alert("Event created successfully!");
+                createEventForm.reset();
+                window.location.reload();
+            } catch (error) {
+                console.error("Error creating event:", error.message);
+                alert(`Error creating event: ${error.message}`);
+            }
+        });
+    }
+}
+
+// View event details
+function viewEventDetails(eventId) {
+    window.location.href = `event-details.html?eventId=${eventId}`;
 }
