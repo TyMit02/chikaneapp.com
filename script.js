@@ -132,3 +132,6 @@ function setupEventModals(auth) {
 function viewEventDetails(eventId) {
     window.location.href = `event-details.html?eventId=${eventId}`;
 }
+
+// Attach to the global window object
+window.viewEventDetails = viewEventDetails
