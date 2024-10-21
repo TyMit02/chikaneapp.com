@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chikane - Event Details</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar sticky">
+        <div class="container">
+            <img src="images/logo.png" alt="Chikane Logo" class="logo">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Back to Dashboard</a></li>
+                <li><a href="#" id="logout-button">Log Out</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Event Details Section -->
+    <section class="event-details">
+        <h1 id="event-name">Event Name</h1>
+        <p id="event-date">Date: </p>
+        <p id="event-description">Description: </p>
+        <h2>Participants</h2>
+        <div id="participants-container" class="participants-container">
+            <!-- Participants will be dynamically added here -->
+        </div>
+    </section>
+
+    <!-- JS Script -->
+    <script src="script.js" type="module"></script>
+</body>
+</html>
