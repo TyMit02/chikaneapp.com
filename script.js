@@ -91,7 +91,7 @@ function setupEventCreation(user) {
     const createEventForm = document.getElementById("create-event-form");
     if (createEventForm) {
         createEventForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
+            event.preventDefault(); // Prevent page refresh
 
             const eventName = document.getElementById("event-name").value;
             const eventDate = document.getElementById("event-date").value;
@@ -99,6 +99,16 @@ function setupEventCreation(user) {
             const trackName = document.getElementById("track-name").value;
             const trackId = document.getElementById("track-id").value;
             const organizerId = user.uid;
+
+            // Log the form data
+            console.log("Creating event with data:", {
+                eventName, eventDate, eventCode, trackName, trackId, organizerId
+            });
+
+            if (!eventName || !eventDate || !eventCode || !trackName || !trackId) {
+                alert("Please fill in all fields.");
+                return;
+            }
 
             try {
                 await addDoc(collection(db, `users/${organizerId}/events`), {
@@ -111,10 +121,11 @@ function setupEventCreation(user) {
                     participants: 0,
                     status: "upcoming"
                 });
+
                 console.log("Event created successfully!");
                 alert("Event created successfully!");
                 createEventForm.reset();
-                window.location.reload();
+                loadDashboard(user); // Refresh the dashboard with the new event
             } catch (error) {
                 console.error("Error creating event:", error.message);
                 alert(`Error creating event: ${error.message}`);
