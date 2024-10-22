@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chikane - Event Organizer Registration</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -20,25 +19,29 @@
     </nav>
 
     <!-- Registration Section -->
-    <section class="register-section">
-        <div class="register-container">
-            <h1>Event Organizer Registration</h1>
+    <section class="registration-section">
+        <div class="registration-container">
+            <h1>Register as Event Organizer</h1>
             <form id="register-form">
-                <input type="email" id="register-email" placeholder="Email" required>
-                <input type="password" id="register-password" placeholder="Password" required>
-                <select id="plan" required>
-                    <option value="">Choose Your Plan</option>
-                    <option value="basic">Basic ($100/month)</option>
-                    <option value="standard">Standard ($200/month)</option>
-                    <option value="premium">Premium ($300/month)</option>
-                </select>
-                <button type="submit" class="register-button">Sign Up</button>
+                <div class="form-group">
+                    <input type="text" id="username" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" placeholder="Password" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+                </div>
+                <button type="submit" class="register-button">Register</button>
             </form>
             <p id="register-error" style="color: red; display: none;"></p>
+            <p class="login-link">Already have an account? <a href="login.html">Login here</a></p>
         </div>
     </section>
 
-    <!-- JS Script -->
-    <script src="script.js" type="module"></script>
+    <script src="register.js" type="module"></script>
 </body>
 </html>

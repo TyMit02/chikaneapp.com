@@ -1543,3 +1543,65 @@ button:hover, .cta-button:hover, .download-button:hover {
     }
 }
 
+/* Add to your existing style.css */
+#login-error {
+    background-color: rgba(255, 0, 0, 0.1);
+    border-left: 4px solid #FF4500;
+    color: #FF4500;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background: #FF4500;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.3s;
+}
+
+.login-button:hover {
+    background: #FF6533;
+}
+
+.login-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Loading state */
+.login-button.loading {
+    position: relative;
+    color: transparent;
+}
+
+.login-button.loading:after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin: -8px 0 0 -8px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

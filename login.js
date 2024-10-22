@@ -1,4 +1,3 @@
-// login.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
 import { 
     getAuth, 
@@ -6,7 +5,6 @@ import {
     onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 
-// Firebase config
 const firebaseConfig = {
     apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
     authDomain: "chikane-e5fa1.firebaseapp.com",
@@ -21,40 +19,46 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Check if user is already logged in
+// Check auth state
 onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log("User is already logged in, redirecting to dashboard...");
+    if (user && window.location.pathname.includes('login.html')) {
         window.location.href = 'dashboard.html';
     }
 });
 
-// Login form handler
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('login-form');
     const errorElement = document.getElementById('login-error');
+    const loginButton = document.querySelector('.login-button');
 
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Reset error message
+            errorElement.style.display = 'none';
+            
+            // Disable button and show loading state
+            loginButton.disabled = true;
+            loginButton.classList.add('loading');
+            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log("Login successful, redirecting...");
+                await signInWithEmailAndPassword(auth, email, password);
                 window.location.href = 'dashboard.html';
             } catch (error) {
                 console.error("Login error:", error);
                 errorElement.textContent = getErrorMessage(error.code);
                 errorElement.style.display = 'block';
+                loginButton.disabled = false;
+                loginButton.classList.remove('loading');
             }
         });
     }
 });
 
-// Helper function to get user-friendly error messages
 function getErrorMessage(errorCode) {
     switch (errorCode) {
         case 'auth/invalid-email':
