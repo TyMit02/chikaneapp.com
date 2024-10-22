@@ -109,24 +109,6 @@ function setupEventCreation(user) {
 
 
 
-// Load event details
-async function loadEventDetails(user, eventId) {
-    try {
-        const eventRef = doc(db, `users/${user.uid}/events/${eventId}`);
-        const eventDoc = await getDoc(eventRef);
-
-        if (eventDoc.exists()) {
-            const eventData = eventDoc.data();
-            document.getElementById("event-title").textContent = eventData.name;
-            document.getElementById("event-description").textContent = eventData.description || "No description available";
-        } else {
-            console.error("Event not found!");
-        }
-    } catch (error) {
-        console.error("Error loading event details:", error.message);
-    }
-}
-
 // View event details
 function viewEventDetails(eventId) {
     window.location.href = `event-details.html?eventId=${eventId}`;
@@ -343,18 +325,6 @@ async function deleteSchedule(userId, eventId, scheduleId) {
     }
 }
 
-// Setup schedule management
-function setupScheduleManagement(user) {
-    const addScheduleForm = document.getElementById("add-schedule-form");
-    if (addScheduleForm) {
-        addScheduleForm.addEventListener("submit", (event) => {
-            event.preventDefault();
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get("eventId");
-            addSchedule(user, eventId);
-        });
-    }
-}
 
 // Initialize schedule management
 document.addEventListener('DOMContentLoaded', () => {
