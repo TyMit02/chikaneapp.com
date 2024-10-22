@@ -724,60 +724,6 @@ async function loadTrackOptions() {
     }
 }
 
-// Initialize Charts
-function initializeCharts() {
-    const revenueCtx = document.getElementById('revenueChart')?.getContext('2d');
-    const breakdownCtx = document.getElementById('registrationBreakdownChart')?.getContext('2d');
-    
-    if (revenueCtx) {
-        new Chart(revenueCtx, {
-            type: 'line',
-            data: {
-                labels: [], // Will be populated with dates
-                datasets: [{
-                    label: 'Revenue',
-                    data: [], // Will be populated with amounts
-                    borderColor: '#FF4500',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#2e3b4e'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: '#2e3b4e'
-                        }
-                    }
-                }
-            }
-        });
-    }
-    
-    if (breakdownCtx) {
-        new Chart(breakdownCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Standard', 'Early Bird', 'Late Registration'],
-                datasets: [{
-                    data: [], // Will be populated
-                    backgroundColor: ['#FF4500', '#4CAF50', '#2196F3']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-    }
-}
 
 // Load Financial Data
 async function loadFinancialData(eventId = null) {
