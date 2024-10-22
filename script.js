@@ -1,85 +1,79 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
-import { getFirestore, doc, collection, addDoc, getDocs, deleteDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
-
-// Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
-    authDomain: "chikane-e5fa1.firebaseapp.com",
-    projectId: "chikane-e5fa1",
-    storageBucket: "chikane-e5fa1.appspot.com",
-    messagingSenderId: "989422231159",
-    appId: "1:989422231159:web:2895f389094dcccb9d3072",
-    measurementId: "G-GX4ZZW6EXK"
-};
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 
 // Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
+  authDomain: "chikane-e5fa1.firebaseapp.com",
+  projectId: "chikane-e5fa1",
+  storageBucket: "chikane-e5fa1.appspot.com",
+  messagingSenderId: "989422231159",
+  appId: "1:989422231159:web:2895f389094dcccb9d3072",
+  measurementId: "G-GX4ZZW6EXK"
+};
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
 // Wait for DOM to load
 document.addEventListener('DOMContentLoaded', () => {
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("User is logged in:", user.email);
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get("eventId");
-
-            if (eventId) {
-                setupEventDetails(user, eventId);
-                setupParticipantManagement(user, eventId);
-                setupScheduleManagement(user, eventId);
-            } else {
-                setupEventCreation(user);
-                loadEvents(user);
-            }
-        } else {
-            console.log("User not logged in");
-            window.location.href = "login.html";
-        }
-    });
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("User is logged in:", user.email);
+      setupEventCreation(user);
+    } else {
+      console.log("User not logged in");
+      window.location.href = "login.html";
+    }
+  });
 });
 
-// Setup event creation
+// Event creation function
 function setupEventCreation(user) {
-    const createEventForm = document.getElementById("create-event-form");
-    if (createEventForm) {
-        createEventForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
+  const createEventForm = document.getElementById("create-event-form");
 
-            const eventName = document.getElementById("event-name").value;
-            const eventDate = document.getElementById("event-date").value;
-            const eventCode = document.getElementById("event-code").value;
-            const trackName = document.getElementById("track-name").value;
-            const trackId = document.getElementById("track-id").value;
+  if (createEventForm) {
+    createEventForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-            if (eventName && eventDate && eventCode && trackName && trackId) {
-                try {
-                    const newEvent = {
-                        name: eventName,
-                        date: new Date(eventDate), // Ensure proper timestamp
-                        eventCode: eventCode,
-                        track: trackName,
-                        trackId: trackId,
-                        organizerId: user.uid,
-                        participants: [], // Initialize with empty array
-                    };
+      const eventName = document.getElementById("event-name").value;
+      const eventDate = document.getElementById("event-date").value;
+      const eventCode = document.getElementById("event-code").value;
+      const trackName = document.getElementById("track-name").value;
+      const trackId = document.getElementById("track-id").value;
 
-                    await addDoc(collection(db, `users/${user.uid}/events`), newEvent);
-                    alert("Event created successfully!");
-                    loadEvents(user);
-                    createEventForm.reset();
-                } catch (error) {
-                    console.error("Error creating event:", error.message);
-                }
-            } else {
-                alert("All fields are required.");
-            }
+      if (!eventName || !eventDate || !eventCode || !trackName || !trackId) {
+        alert("Please fill out all event fields.");
+        return;
+      }
+
+      try {
+        // Add the event to Firestore
+        await addDoc(collection(db, `users/${user.uid}/events`), {
+          name: eventName,
+          date: new Date(eventDate),
+          eventCode: eventCode,
+          track: trackName,
+          trackId: trackId,
+          organizerId: user.uid,
+          participants: [],
+          createdAt: serverTimestamp()
         });
-    }
-}
 
+        console.log("Event created successfully!");
+        alert("Event created successfully!");
+        createEventForm.reset();
+      } catch (error) {
+        console.error("Error creating event:", error.message);
+        alert("Error creating event: " + error.message);
+      }
+    });
+  } else {
+    console.warn("Create Event form not found.");
+  }
+}
 // Load events
 async function loadEvents(user) {
     try {
