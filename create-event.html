@@ -77,5 +77,32 @@
     <!-- Add these scripts -->
     <script type="module" src="auth-handler.js"></script>
     <script type="module" src="script.js"></script>
+
+    <!-- Script to load tracks from JSON -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fetch the JSON data for tracks
+            fetch('custom_tracks.json')
+                .then(response => response.json())
+                .then(data => {
+                    const trackDropdown = document.getElementById('track-name');
+                    data.forEach(track => {
+                        const option = document.createElement('option');
+                        option.value = track.id;
+                        option.textContent = `${track.name} (${track.configuration})`;
+                        trackDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading track data:', error));
+
+            // Set the hidden track ID input based on the selected track
+            const trackDropdown = document.getElementById('track-name');
+            const trackIdInput = document.getElementById('track-id');
+
+            trackDropdown.addEventListener('change', () => {
+                trackIdInput.value = trackDropdown.value;
+            });
+        });
+    </script>
 </body>
 </html>
