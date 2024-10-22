@@ -298,9 +298,9 @@ async function loadSchedules(user, eventId) {
         const scheduleSnapshot = await getDocs(schedulesRef);
         const scheduleList = document.getElementById("schedules-list");
 
-        // Ensure that the element exists before modifying it
+        // Ensure the element exists
         if (!scheduleList) {
-            console.error("Schedule list element not found.");
+            console.warn("Schedule list element not found.");
             return;
         }
 
