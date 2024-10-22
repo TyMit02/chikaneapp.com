@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+import { getFirestore, doc, collection, addDoc, getDocs, deleteDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
 
 // Firebase configuration
 const firebaseConfig = {
@@ -181,4 +182,128 @@ if (logoutButton) {
             console.error("Logout error:", error.message);
         }
     });
+}
+
+// Check if user is logged in
+document.addEventListener('DOMContentLoaded', () => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("User is logged in:", user.email);
+            loadEventDetails(user);
+            setupParticipantManagement(user);
+        } else {
+            console.log("User not logged in, redirecting to login.");
+            window.location.href = "login.html";
+        }
+    });
+
+    // Handle logout
+    const logoutButton = document.getElementById("logout-button");
+    if (logoutButton) {
+        logoutButton.addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                console.log("Logout successful!");
+                window.location.href = "login.html";
+            } catch (error) {
+                console.error("Logout error:", error.message);
+            }
+        });
+    }
+});
+
+// Load event details and participants
+async function loadEventDetails(user) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get("eventId");
+
+    if (eventId) {
+        try {
+            const eventRef = doc(db, `users/${user.uid}/events`, eventId);
+            const eventSnap = await getDoc(eventRef);
+
+            if (eventSnap.exists()) {
+                const eventData = eventSnap.data();
+                document.getElementById("event-name").textContent = eventData.name;
+                document.getElementById("event-date").textContent = eventData.date;
+                document.getElementById("event-description").textContent = eventData.description;
+
+                loadParticipants(user, eventId);
+            } else {
+                console.error("No event found!");
+            }
+        } catch (error) {
+            console.error("Error loading event details:", error.message);
+        }
+    } else {
+        console.error("Event ID not found in URL.");
+    }
+}
+
+// Load participants for an event
+async function loadParticipants(user, eventId) {
+    try {
+        const participantsRef = collection(db, `users/${user.uid}/events/${eventId}/participants`);
+        const participantSnapshot = await getDocs(participantsRef);
+        const participantList = document.getElementById("participants-list");
+
+        participantList.innerHTML = ""; // Clear existing list
+
+        participantSnapshot.forEach((doc) => {
+            const participantData = doc.data();
+
+            // Create participant item
+            const participantItem = document.createElement("div");
+            participantItem.classList.add("participant-item");
+            participantItem.innerHTML = `
+                <p>${participantData.name}</p>
+                <button onclick="removeParticipant('${user.uid}', '${eventId}', '${doc.id}')">Remove</button>
+            `;
+            participantList.appendChild(participantItem);
+        });
+    } catch (error) {
+        console.error("Error loading participants:", error.message);
+    }
+}
+
+// Add a new participant to an event
+async function addParticipant(user, eventId) {
+    const participantName = document.getElementById("participant-name").value;
+    if (participantName.trim() === "") return alert("Please enter a participant name.");
+
+    try {
+        await addDoc(collection(db, `users/${user.uid}/events/${eventId}/participants`), {
+            name: participantName,
+            registrationDate: new Date().toISOString()
+        });
+        console.log("Participant added successfully!");
+        document.getElementById("participant-name").value = "";
+        loadParticipants(user, eventId); // Refresh participant list
+    } catch (error) {
+        console.error("Error adding participant:", error.message);
+    }
+}
+
+// Remove a participant from an event
+async function removeParticipant(userId, eventId, participantId) {
+    try {
+        await deleteDoc(doc(db, `users/${userId}/events/${eventId}/participants`, participantId));
+        console.log("Participant removed successfully!");
+        loadParticipants({ uid: userId }, eventId); // Refresh participant list
+    } catch (error) {
+        console.error("Error removing participant:", error.message);
+    }
+}
+
+// Setup participant management
+function setupParticipantManagement(user) {
+    const addParticipantForm = document.getElementById("add-participant-form");
+    if (addParticipantForm) {
+        addParticipantForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get("eventId");
+            addParticipant(user, eventId);
+        });
+    }
 }
