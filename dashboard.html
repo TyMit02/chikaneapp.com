@@ -15,29 +15,61 @@
             </div>
             <div class="nav-links-container">
                 <ul class="nav-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="create-event.html">Create Event</a></li>
+                    <li><a href="#" data-view="dashboard">Dashboard</a></li>
+                    <li><a href="#" data-view="create-event">Create Event</a></li>
                     <li><a href="#" id="logout-button">Log Out</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container">
-        <div class="dashboard-header">
-            <h1>Your Events</h1>
-            <div class="event-filters">
-                <select id="eventFilter" class="filter-select">
-                    <option value="all">All Events</option>
-                    <option value="upcoming">Upcoming Events</option>
-                    <option value="past">Past Events</option>
-                </select>
+    <!-- Dynamic Content Container -->
+    <div id="main-content">
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view-container">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h1>Your Events</h1>
+                    <div class="event-filters">
+                        <select id="eventFilter" class="filter-select">
+                            <option value="all">All Events</option>
+                            <option value="upcoming">Upcoming Events</option>
+                            <option value="past">Past Events</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="events-grid" id="eventsContainer">
+                    <!-- Events will be dynamically inserted here -->
+                </div>
             </div>
         </div>
 
-        <div class="events-grid" id="eventsContainer">
-            <!-- Events will be dynamically inserted here -->
+        <!-- Create Event View -->
+        <div id="create-event-view" class="view-container" style="display: none;">
+            <div class="container">
+                <div class="create-event-container">
+                    <h1>Create New Event</h1>
+                    <form id="create-event-form">
+                        <div class="form-group">
+                            <input type="text" id="event-name" placeholder="Event Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="date" id="event-date" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="event-code" placeholder="Event Code" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="track-name" placeholder="Track Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="track-id" placeholder="Track ID" required>
+                        </div>
+                        <input type="hidden" id="organizer-id">
+                        <button type="submit" class="create-event-button">Create Event</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -46,5 +78,7 @@
             <p>&copy; 2024 Chikane. All rights reserved.</p>
         </div>
     </footer>
+
+    <script src="script.js" type="module"></script>
 </body>
 </html>

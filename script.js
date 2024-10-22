@@ -42,24 +42,41 @@ let currentUser = null;
 let currentEventId = null;
 
 // DOM Content Loaded Event Listener
-document.addEventListener('DOMContentLoaded', () => {
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUser = user;
-            console.log("User logged in:", user.email);
-            initializeEventManagement();
-            
-            // Set organizer ID in form if it exists
-            const organizerIdInput = document.getElementById("organizer-id");
-            if (organizerIdInput) {
-                organizerIdInput.value = user.uid;
-            }
-        } else {
-            console.log("No user logged in");
-            window.location.href = "login.html";
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup view switching
+    const navLinks = document.querySelectorAll('.nav-links a[data-view]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const viewName = e.target.dataset.view;
+            switchView(viewName);
+        });
     });
+
+    // Initial view based on hash or default to dashboard
+    const initialView = window.location.hash.slice(1) || 'dashboard';
+    switchView(initialView);
 });
+
+function switchView(viewName) {
+    // Hide all views
+    const views = document.querySelectorAll('.view-container');
+    views.forEach(view => view.style.display = 'none');
+
+    // Show selected view
+    const selectedView = document.getElementById(`${viewName}-view`);
+    if (selectedView) {
+        selectedView.style.display = 'block';
+        // Update URL hash without page reload
+        window.location.hash = viewName;
+        
+        // Initialize view-specific functionality
+        if (viewName === 'dashboard') {
+            loadEvents();
+        }
+    }
+}
+
 
 // Initialize application (renamed from initializeApp to avoid conflict)
 function initializeEventManagement() {
