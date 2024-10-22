@@ -18,68 +18,95 @@
         </div>
     </nav>
 
-    <!-- Event Header -->
-    <section class="event-header">
-        <div class="container">
+    <!-- Event Details Content -->
+    <div class="container">
+        <!-- Event Overview Card -->
+        <div class="card event-overview">
             <h1 id="event-title">Event Title</h1>
             <div class="event-meta">
-                <span>Code: <span id="code-value">N/A</span></span>
-                <span>Track: <span id="track-value">N/A</span></span>
-                <span>Organizer: <span id="organizer-name">N/A</span></span>
+                <div class="meta-item">
+                    <i class="fas fa-hashtag"></i>
+                    <span>Code: <strong id="code-value">N/A</strong></span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Track: <strong id="track-value">N/A</strong></span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Date: <strong id="event-date">N/A</strong></span>
+                </div>
             </div>
         </div>
-    </section>
 
-    <!-- Event Details Grid -->
-    <section class="event-details-grid">
-        <div class="container">
-            <div class="grid-container">
-                <!-- Participants Section -->
-                <div class="grid-item participants-section">
+        <!-- Cards Grid -->
+        <div class="cards-grid">
+            <!-- Participants Card -->
+            <div class="card">
+                <div class="card-header">
                     <h2>Participants</h2>
-                    <div id="participants-list" class="participant-list">
-                        <!-- Participants will be loaded here -->
+                    <span class="participant-count" id="participant-count">0 Participants</span>
+                </div>
+                <div class="card-content">
+                    <div id="participants-list" class="participants-list">
+                        <!-- Participants will be dynamically added here -->
                     </div>
-                    <form id="add-participant-form" class="add-item-form">
-                        <input type="text" id="participant-name" placeholder="Participant Name" required>
-                        <button type="submit">Add Participant</button>
+                    <form id="add-participant-form" class="add-form">
+                        <div class="form-group">
+                            <input type="text" id="participant-name" placeholder="Participant Name" required>
+                            <button type="submit" class="btn-primary">Add Participant</button>
+                        </div>
                     </form>
                 </div>
+            </div>
 
-                <!-- Details Section -->
-                <div class="grid-item details-section">
-                    <h2>Event Details</h2>
-                    <div class="details-content">
+            <!-- Event Details Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Details</h2>
+                </div>
+                <div class="card-content">
+                    <div class="details-grid">
                         <div class="detail-item">
-                            <label>Date:</label>
-                            <span id="event-date">N/A</span>
+                            <label>Organizer</label>
+                            <span id="organizer-name">N/A</span>
                         </div>
                         <div class="detail-item">
-                            <label>Track Configuration:</label>
+                            <label>Track Configuration</label>
                             <span id="track-config">N/A</span>
                         </div>
                         <div class="detail-item">
-                            <label>Total Participants:</label>
-                            <span id="participant-count">0</span>
+                            <label>Start Time</label>
+                            <span id="start-time">N/A</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Event Type</label>
+                            <span id="event-type">N/A</span>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Schedule Section -->
-                <div class="grid-item schedule-section">
+            <!-- Schedule Card -->
+            <div class="card">
+                <div class="card-header">
                     <h2>Schedule</h2>
-                    <div id="schedules-list" class="schedule-list">
-                        <!-- Schedules will be loaded here -->
+                </div>
+                <div class="card-content">
+                    <div id="schedules-list" class="schedules-list">
+                        <!-- Schedules will be dynamically added here -->
                     </div>
-                    <form id="add-schedule-form" class="add-item-form">
-                        <input type="text" id="schedule-title" placeholder="Schedule Title" required>
-                        <input type="datetime-local" id="schedule-date" required>
-                        <button type="submit">Add Schedule</button>
+                    <form id="add-schedule-form" class="add-form">
+                        <div class="form-group">
+                            <input type="text" id="schedule-title" placeholder="Schedule Title" required>
+                            <input type="datetime-local" id="schedule-date" required>
+                            <button type="submit" class="btn-primary">Add Schedule</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -88,7 +115,6 @@
         </div>
     </footer>
 
-    <!-- JS Script -->
     <script src="script.js" type="module"></script>
 </body>
 </html>
