@@ -222,38 +222,53 @@ async function removeParticipant(userId, eventId, participantId) {
 
 // Setup event creation form
 function setupEventCreation(user) {
-    const createEventForm = document.getElementById("create-event-form");
+    document.addEventListener('DOMContentLoaded', () => {
+        const createEventForm = document.getElementById("create-event-form");
 
-    if (createEventForm) {
-        createEventForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
+        if (createEventForm) {
+            createEventForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
 
-            const eventName = document.getElementById("event-name").value;
-            const eventDate = document.getElementById("event-date").value;
-            const eventDescription = document.getElementById("event-description").value;
+                // Get input values safely
+                const eventNameInput = document.getElementById("event-name");
+                const eventDateInput = document.getElementById("event-date");
+                const eventDescriptionInput = document.getElementById("event-description");
 
-            if (!eventName || !eventDate || !eventDescription) {
-                return alert("Please fill out all event fields.");
-            }
+                // Check if inputs exist
+                if (!eventNameInput || !eventDateInput || !eventDescriptionInput) {
+                    console.error("One or more input fields not found.");
+                    return;
+                }
 
-            try {
-                await addDoc(collection(db, `users/${user.uid}/events`), {
-                    name: eventName,
-                    date: eventDate,
-                    description: eventDescription,
-                    createdAt: new Date().toISOString(),
-                });
-                console.log("Event created successfully!");
-                alert("Event created successfully!");
-                loadEvents(user);
-                createEventForm.reset();
-            } catch (error) {
-                console.error("Error creating event:", error.message);
-            }
-        });
-    }
+                const eventName = eventNameInput.value;
+                const eventDate = eventDateInput.value;
+                const eventDescription = eventDescriptionInput.value;
+
+                // Validate input fields
+                if (!eventName || !eventDate || !eventDescription) {
+                    return alert("Please fill out all event fields.");
+                }
+
+                try {
+                    await addDoc(collection(db, `users/${user.uid}/events`), {
+                        name: eventName,
+                        date: eventDate,
+                        description: eventDescription,
+                        createdAt: new Date().toISOString(),
+                    });
+                    console.log("Event created successfully!");
+                    alert("Event created successfully!");
+                    loadEvents(user);
+                    createEventForm.reset();
+                } catch (error) {
+                    console.error("Error creating event:", error.message);
+                }
+            });
+        } else {
+            console.warn("Create Event form not found.");
+        }
+    });
 }
-
 // Load events for the user
 async function loadEvents(user) {
     try {
