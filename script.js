@@ -50,16 +50,23 @@ function setupEventCreation(user) {
 
             const eventName = document.getElementById("event-name").value;
             const eventDate = document.getElementById("event-date").value;
-            const eventDescription = document.getElementById("event-description").value;
+            const eventCode = document.getElementById("event-code").value;
+            const trackName = document.getElementById("track-name").value;
+            const trackId = document.getElementById("track-id").value;
 
-            if (eventName && eventDate && eventDescription) {
+            if (eventName && eventDate && eventCode && trackName && trackId) {
                 try {
-                    await addDoc(collection(db, `users/${user.uid}/events`), {
+                    const newEvent = {
                         name: eventName,
-                        date: eventDate,
-                        description: eventDescription,
-                        createdAt: new Date().toISOString(),
-                    });
+                        date: new Date(eventDate), // Ensure proper timestamp
+                        eventCode: eventCode,
+                        track: trackName,
+                        trackId: trackId,
+                        organizerId: user.uid,
+                        participants: [], // Initialize with empty array
+                    };
+
+                    await addDoc(collection(db, `users/${user.uid}/events`), newEvent);
                     alert("Event created successfully!");
                     loadEvents(user);
                     createEventForm.reset();
@@ -87,8 +94,8 @@ async function loadEvents(user) {
             eventCard.classList.add("event-card");
             eventCard.innerHTML = `
                 <h3>${eventData.name}</h3>
-                <p>Date: ${eventData.date}</p>
-                <p>${eventData.description}</p>
+                <p>Date: ${new Date(eventData.date.seconds * 1000).toLocaleDateString()}</p>
+                <p>Track: ${eventData.track}</p>
                 <button onclick="viewEventDetails('${doc.id}')">View Details</button>
             `;
             eventContainer.appendChild(eventCard);
@@ -126,8 +133,8 @@ async function loadEventDetails(user, eventId) {
         if (eventDoc.exists()) {
             const eventData = eventDoc.data();
             eventTitle.textContent = eventData.name;
-            eventCode.textContent = eventData.code || "N/A";
-            trackName.textContent = eventData.track || "N/A";
+            eventCode.textContent = eventData.eventCode;
+            trackName.textContent = eventData.track;
         } else {
             console.error("No such event found.");
         }
@@ -146,8 +153,8 @@ function setupParticipantManagement(user, eventId) {
             const participantName = document.getElementById("participant-name").value;
             if (participantName) {
                 try {
-                    await addDoc(collection(db, `users/${user.uid}/events/${eventId}/participants`), {
-                        name: participantName,
+                    await updateDoc(doc(db, `users/${user.uid}/events`, eventId), {
+                        participants: arrayUnion(participantName),
                     });
                     alert("Participant added successfully!");
                     loadParticipants(user, eventId);
@@ -174,15 +181,15 @@ async function loadParticipants(user, eventId) {
 
     participantList.innerHTML = "";
     try {
-        const participantsRef = collection(db, `users/${user.uid}/events/${eventId}/participants`);
-        const participantSnapshot = await getDocs(participantsRef);
-
-        participantSnapshot.forEach((doc) => {
-            const participantData = doc.data();
-            const participantItem = document.createElement("div");
-            participantItem.textContent = participantData.name;
-            participantList.appendChild(participantItem);
-        });
+        const eventDoc = await getDoc(doc(db, `users/${user.uid}/events`, eventId));
+        if (eventDoc.exists()) {
+            const eventData = eventDoc.data();
+            eventData.participants.forEach((participant) => {
+                const participantItem = document.createElement("div");
+                participantItem.textContent = participant;
+                participantList.appendChild(participantItem);
+            });
+        }
     } catch (error) {
         console.error("Error loading participants:", error.message);
     }
