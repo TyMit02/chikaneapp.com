@@ -1167,3 +1167,74 @@ function renderEventCard(eventData, eventId) {
         console.error("Events container not found.");
     }
 }
+
+// Function to set up financial metrics on the dashboard
+function setupFinancialMetrics() {
+    // Fetch financial data from Firestore or other source
+    const totalRevenueElement = document.getElementById('total-revenue');
+    const pendingPayoutsElement = document.getElementById('pending-payouts');
+    const activeRegistrationsElement = document.getElementById('active-registrations');
+    const stripeStatusElement = document.getElementById('stripe-status');
+
+    if (!totalRevenueElement || !pendingPayoutsElement || !activeRegistrationsElement || !stripeStatusElement) {
+        console.error("Financial metrics elements not found on the page.");
+        return;
+    }
+
+    // Simulate fetching financial data (replace with real data fetching logic)
+    totalRevenueElement.textContent = "$10,000.00";
+    pendingPayoutsElement.textContent = "$2,000.00";
+    activeRegistrationsElement.textContent = "50";
+    stripeStatusElement.textContent = "Connected";
+
+    console.log("Financial metrics set up successfully.");
+}
+
+// Function to set up event creation form
+function setupEventCreation(user) {
+    const createEventForm = document.getElementById("create-event-form");
+
+    if (!createEventForm) {
+        console.warn("Create Event form not found.");
+        return;
+    }
+
+    createEventForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        // Get input values from the form
+        const eventName = document.getElementById("event-name").value;
+        const eventDate = document.getElementById("event-date").value;
+        const eventCode = document.getElementById("event-code").value;
+        const trackName = document.getElementById("track-name").value;
+        const trackId = document.getElementById("track-id").value;
+        const organizerId = user.uid;
+
+        // Validate input fields
+        if (!eventName || !eventDate || !eventCode || !trackName || !trackId) {
+            alert("Please fill out all fields.");
+            return;
+        }
+
+        try {
+            // Add the new event to Firestore
+            await addDoc(collection(db, `users/${organizerId}/events`), {
+                name: eventName,
+                date: eventDate,
+                eventCode: eventCode,
+                track: trackName,
+                trackId: trackId,
+                organizerId: organizerId,
+                participants: [], // Initialize empty participants array
+                createdAt: serverTimestamp()
+            });
+            console.log("Event created successfully!");
+            alert("Event created successfully!");
+            createEventForm.reset(); // Clear the form after successful submission
+            loadDashboard(user); // Refresh dashboard after event creation
+        } catch (error) {
+            console.error("Error creating event:", error);
+            alert("Error creating event.");
+        }
+    });
+}
