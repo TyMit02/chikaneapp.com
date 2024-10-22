@@ -1630,3 +1630,117 @@ button:hover, .cta-button:hover, .download-button:hover {
     border-radius: 8px;
     z-index: 1000;
 }
+
+/* Add these styles to your style.css file */
+
+.create-event-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #1A2838;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.create-event-container h1 {
+    color: #E6F0FF;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.event-form .form-group {
+    margin-bottom: 20px;
+}
+
+.event-form label {
+    display: block;
+    color: #E6F0FF;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.event-form input,
+.event-form select {
+    width: 100%;
+    padding: 12px;
+    background: #0A1828;
+    border: 1px solid #2e3b4e;
+    border-radius: 5px;
+    color: #E6F0FF;
+    font-size: 1rem;
+}
+
+.event-form input:focus,
+.event-form select:focus {
+    outline: none;
+    border-color: #FF4500;
+}
+
+.create-event-button {
+    width: 100%;
+    padding: 15px;
+    background: #FF4500;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.create-event-button:hover {
+    background: #FF6533;
+}
+
+.success-alert {
+    background-color: rgba(46, 204, 113, 0.1);
+    border-left: 4px solid #2ecc71;
+    color: #2ecc71;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* Style placeholder text */
+.event-form input::placeholder {
+    color: #4a5568;
+}
+
+/* Style disabled state */
+.event-form input:disabled,
+.event-form select:disabled,
+.create-event-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Add loading spinner for button */
+.create-event-button.loading {
+    position: relative;
+    color: transparent;
+}
+
+.create-event-button.loading:after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
