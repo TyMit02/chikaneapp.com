@@ -32,6 +32,7 @@ const firebaseConfig = {
     measurementId: "G-GX4ZZW6EXK"
 };
 
+// Initialize Firebase services
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
@@ -46,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             currentUser = user;
             console.log("User logged in:", user.email);
-            initializeApp();
+            initializeEventManagement();
             
             // Set organizer ID in form if it exists
             const organizerIdInput = document.getElementById("organizer-id");
@@ -60,8 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Initialize application
-function initializeApp() {
+// Initialize application (renamed from initializeApp to avoid conflict)
+function initializeEventManagement() {
     setupEventForm();
     setupParticipantForm();
     setupScheduleForm();
