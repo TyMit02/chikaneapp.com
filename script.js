@@ -84,16 +84,15 @@ function setupEventCreation(user) {
             const eventCode = document.getElementById("event-code").value;
             const trackName = document.getElementById("track-name").value;
             const trackId = document.getElementById("track-id").value;
-            const organizerId = auth.currentUser.uid;
 
             try {
-                await addDoc(collection(db, `users/${organizerId}/events`), {
+                await addDoc(collection(db, `users/${user.uid}/events`), {
                     name: eventName,
                     date: eventDate,
                     eventCode: eventCode,
                     track: trackName,
                     trackId: trackId,
-                    organizerId: organizerId,
+                    organizerId: user.uid,
                     participants: [],
                     status: "upcoming"
                 });
@@ -105,6 +104,30 @@ function setupEventCreation(user) {
                 alert(`Error creating event: ${error.message}`);
             }
         });
+    }
+}
+
+// View event details
+function viewEventDetails(eventId) {
+    window.location.href = `event-details.html?eventId=${eventId}`;
+}
+window.viewEventDetails = viewEventDetails;
+
+// Load event details
+async function loadEventDetails(user, eventId) {
+    try {
+        const eventRef = doc(db, `users/${user.uid}/events/${eventId}`);
+        const eventDoc = await getDoc(eventRef);
+
+        if (eventDoc.exists()) {
+            const eventData = eventDoc.data();
+            document.getElementById("event-title").textContent = eventData.name;
+            document.getElementById("event-description").textContent = eventData.description || "No description available";
+        } else {
+            console.error("Event not found!");
+        }
+    } catch (error) {
+        console.error("Error loading event details:", error.message);
     }
 }
 
@@ -239,29 +262,7 @@ function setupParticipantManagement(user, eventId) {
     loadParticipants(user, eventId); // Load participants on page load
 }
 
-// Fetch participants from Firestore
-async function loadParticipants(user, eventId) {
-    const participantList = document.getElementById("participants-list");
-    participantList.innerHTML = ""; // Clear existing participants
 
-    try {
-        const participantsRef = collection(db, `users/${user.uid}/events/${eventId}/participants`);
-        const snapshot = await getDocs(participantsRef);
-
-        snapshot.forEach((doc) => {
-            const participantData = doc.data();
-            const participantItem = document.createElement("div");
-            participantItem.classList.add("participant-item");
-            participantItem.innerHTML = `
-                <p>${participantData.name}</p>
-                <button onclick="removeParticipant('${user.uid}', '${eventId}', '${doc.id}')">Remove</button>
-            `;
-            participantList.appendChild(participantItem);
-        });
-    } catch (error) {
-        console.error("Error loading participants:", error.message);
-    }
-}
 
 // Fetch event details from Firestore
 async function loadEventDetails(user, eventId) {
