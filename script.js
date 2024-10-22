@@ -1115,41 +1115,7 @@ async function setupEventManagement(user) {
     }
 }
 
-// Function to load events for the organizer
-async function loadEvents(user) {
-    const eventsContainer = document.getElementById("eventsContainer");
-    eventsContainer.innerHTML = ""; // Clear previous events
 
-    try {
-        // Fetch events from Firestore
-        const eventsSnapshot = await getDocs(collection(db, `users/${user.uid}/events`));
-        
-        if (eventsSnapshot.empty) {
-            eventsContainer.innerHTML = "<p>No events found.</p>";
-            return;
-        }
-
-        // Loop through events and display them
-        eventsSnapshot.forEach((doc) => {
-            const eventData = doc.data();
-
-            // Create event card
-            const eventCard = document.createElement("div");
-            eventCard.classList.add("event-card");
-            eventCard.innerHTML = `
-                <h3>${eventData.name}</h3>
-                <p>Date: ${eventData.date}</p>
-                <p>Code: ${eventData.eventCode}</p>
-                <button onclick="viewEventDetails('${doc.id}')">View Details</button>
-                <button onclick="editEvent('${doc.id}')">Edit</button>
-                <button onclick="deleteEvent('${doc.id}')">Delete</button>
-            `;
-            eventsContainer.appendChild(eventCard);
-        });
-    } catch (error) {
-        console.error("Error loading events:", error);
-    }
-}
 
 // Function to delete an event
 async function deleteEvent(eventId) {
