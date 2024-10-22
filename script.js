@@ -1,258 +1,455 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+import { 
+    getFirestore, 
+    collection, 
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    getDocs,
+    getDoc,
+    doc,
+    query,
+    where,
+    orderBy,
+    serverTimestamp,
+    arrayUnion,
+    arrayRemove 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 
-// Initialize Firebase
+// Initialize Firebase with your config
 const firebaseConfig = {
-  apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
-  authDomain: "chikane-e5fa1.firebaseapp.com",
-  projectId: "chikane-e5fa1",
-  storageBucket: "chikane-e5fa1.appspot.com",
-  messagingSenderId: "989422231159",
-  appId: "1:989422231159:web:2895f389094dcccb9d3072",
-  measurementId: "G-GX4ZZW6EXK"
+    apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
+    authDomain: "chikane-e5fa1.firebaseapp.com",
+    projectId: "chikane-e5fa1",
+    storageBucket: "chikane-e5fa1.appspot.com",
+    messagingSenderId: "989422231159",
+    appId: "1:989422231159:web:2895f389094dcccb9d3072",
+    measurementId: "G-GX4ZZW6EXK"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Wait for DOM to load
+// State management
+let currentUser = null;
+let currentEventId = null;
+
+// DOM Content Loaded Event Listener
 document.addEventListener('DOMContentLoaded', () => {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log("User is logged in:", user.email);
-      setupEventCreation(user);
-    } else {
-      console.log("User not logged in");
-      window.location.href = "login.html";
-    }
-  });
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            console.log("User logged in:", user.email);
+            initializeApp();
+            
+            // Set organizer ID in form if it exists
+            const organizerIdInput = document.getElementById("organizer-id");
+            if (organizerIdInput) {
+                organizerIdInput.value = user.uid;
+            }
+        } else {
+            console.log("No user logged in");
+            window.location.href = "login.html";
+        }
+    });
 });
 
-// Event creation function
-function setupEventCreation(user) {
-  const createEventForm = document.getElementById("create-event-form");
+// Initialize application
+function initializeApp() {
+    setupEventForm();
+    setupParticipantForm();
+    setupScheduleForm();
+    loadDashboardSummary();
+    
+    // Check if we're on the event details page
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('eventId');
+    if (eventId && window.location.pathname.includes('event-details.html')) {
+        currentEventId = eventId;
+        loadEventDetails(eventId);
+    } else {
+        loadEvents();
+    }
 
-  if (createEventForm) {
-    createEventForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      const eventName = document.getElementById("event-name").value;
-      const eventDate = document.getElementById("event-date").value;
-      const eventCode = document.getElementById("event-code").value;
-      const trackName = document.getElementById("track-name").value;
-      const trackId = document.getElementById("track-id").value;
-
-      if (!eventName || !eventDate || !eventCode || !trackName || !trackId) {
-        alert("Please fill out all event fields.");
-        return;
-      }
-
-      try {
-        // Add the event to Firestore
-        await addDoc(collection(db, `users/${user.uid}/events`), {
-          name: eventName,
-          date: new Date(eventDate),
-          eventCode: eventCode,
-          track: trackName,
-          trackId: trackId,
-          organizerId: user.uid,
-          participants: [],
-          createdAt: serverTimestamp()
-        });
-
-        console.log("Event created successfully!");
-        alert("Event created successfully!");
-        createEventForm.reset();
-      } catch (error) {
-        console.error("Error creating event:", error.message);
-        alert("Error creating event: " + error.message);
-      }
-    });
-  } else {
-    console.warn("Create Event form not found.");
-  }
+    // Setup logout button
+    const logoutButton = document.getElementById("logout-button");
+    if (logoutButton) {
+        logoutButton.addEventListener("click", handleLogout);
+    }
 }
-// Load events
-async function loadEvents(user) {
-    try {
-        const eventsRef = collection(db, `users/${user.uid}/events`);
-        const eventSnapshot = await getDocs(eventsRef);
-        const eventContainer = document.getElementById("event-container");
 
+// Event Form Setup
+function setupEventForm() {
+    const createEventForm = document.getElementById("create-event-form");
+    if (createEventForm) {
+        createEventForm.addEventListener("submit", handleEventSubmit);
+    }
+}
+
+// Event Creation Handler
+async function handleEventSubmit(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const eventName = form.querySelector("#event-name").value;
+    const eventDate = form.querySelector("#event-date").value;
+    const eventCode = form.querySelector("#event-code").value;
+    const trackName = form.querySelector("#track-name").value;
+    const trackId = form.querySelector("#track-id").value;
+
+    try {
+        // Validate event code
+        const isCodeValid = await validateEventCode(eventCode);
+        if (!isCodeValid) {
+            showError("Event code already exists. Please choose another.");
+            return;
+        }
+
+        // Create event
+        const eventData = {
+            name: eventName,
+            date: new Date(eventDate),
+            track: trackName,
+            trackId: trackId,
+            organizerId: currentUser.uid,
+            eventCode: eventCode,
+            participants: [],
+            createdAt: serverTimestamp()
+        };
+
+        const docRef = await addDoc(collection(db, "events"), eventData);
+        
+        showSuccess("Event created successfully!");
+        form.reset();
+        loadEvents();
+        updateDashboardSummary();
+
+    } catch (error) {
+        console.error("Error creating event:", error);
+        showError("Failed to create event: " + error.message);
+    }
+}
+
+// Event Code Validation
+async function validateEventCode(eventCode) {
+    const eventsRef = collection(db, "events");
+    const q = query(eventsRef, where("eventCode", "==", eventCode));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.empty;
+}
+
+// Load Events
+async function loadEvents() {
+    const eventContainer = document.getElementById("event-container");
+    if (!eventContainer) return;
+
+    try {
+        const eventsRef = collection(db, "events");
+        const q = query(
+            eventsRef, 
+            where("organizerId", "==", currentUser.uid),
+            orderBy("date", "desc")
+        );
+        
+        const querySnapshot = await getDocs(q);
+        
         eventContainer.innerHTML = "";
-        eventSnapshot.forEach((doc) => {
-            const eventData = doc.data();
-            const eventCard = document.createElement("div");
-            eventCard.classList.add("event-card");
-            eventCard.innerHTML = `
-                <h3>${eventData.name}</h3>
-                <p>Date: ${new Date(eventData.date.seconds * 1000).toLocaleDateString()}</p>
-                <p>Track: ${eventData.track}</p>
-                <button onclick="viewEventDetails('${doc.id}')">View Details</button>
-            `;
+        
+        querySnapshot.forEach((doc) => {
+            const event = doc.data();
+            const eventDate = event.date.toDate();
+            
+            const eventCard = createElement('div', {
+                className: 'event-card',
+                innerHTML: `
+                    <h3>${event.name}</h3>
+                    <p>Date: ${eventDate.toLocaleDateString()}</p>
+                    <p>Track: ${event.track}</p>
+                    <p>Event Code: ${event.eventCode}</p>
+                    <p>Participants: ${event.participants?.length || 0}</p>
+                    <button class="view-details-btn" data-event-id="${doc.id}">
+                        View Details
+                    </button>
+                `
+            });
+            
+            const viewButton = eventCard.querySelector('.view-details-btn');
+            viewButton.addEventListener('click', () => {
+                window.location.href = `event-details.html?eventId=${doc.id}`;
+            });
+            
             eventContainer.appendChild(eventCard);
         });
+
     } catch (error) {
-        console.error("Error loading events:", error.message);
+        console.error("Error loading events:", error);
+        showError("Failed to load events");
     }
 }
 
-// View event details
-window.viewEventDetails = function(eventId) {
-    window.location.href = `event-details.html?eventId=${eventId}`;
-}
-
-// Setup event details page
-function setupEventDetails(user, eventId) {
-    loadEventDetails(user, eventId);
-    setupParticipantManagement(user, eventId);
-    setupScheduleManagement(user, eventId);
-}
-
-// Load event details
-async function loadEventDetails(user, eventId) {
-    const eventTitle = document.getElementById("event-title");
-    const eventCode = document.getElementById("event-code");
-    const trackName = document.getElementById("track-name");
-
-    if (!eventTitle || !eventCode || !trackName) {
-        console.error("Event detail elements not found on the page.");
-        return;
-    }
-
+// Load Event Details
+async function loadEventDetails(eventId) {
     try {
-        const eventDoc = await getDoc(doc(db, `users/${user.uid}/events`, eventId));
-        if (eventDoc.exists()) {
-            const eventData = eventDoc.data();
-            eventTitle.textContent = eventData.name;
-            eventCode.textContent = eventData.eventCode;
-            trackName.textContent = eventData.track;
-        } else {
-            console.error("No such event found.");
+        const eventDoc = await getDoc(doc(db, "events", eventId));
+        if (!eventDoc.exists()) {
+            showError("Event not found");
+            return;
         }
+
+        const event = eventDoc.data();
+        
+        // Update UI elements
+        updateElement("event-title", event.name);
+        updateElement("code-value", event.eventCode);
+        updateElement("track-value", event.track);
+        
+        // Load participants list
+        const participantsList = document.getElementById("participants-list");
+        if (participantsList) {
+            participantsList.innerHTML = "";
+            
+            if (event.participants && event.participants.length > 0) {
+                event.participants.forEach(participant => {
+                    const participantEl = createElement('div', {
+                        className: 'participant-item',
+                        innerHTML: `
+                            <span>${participant}</span>
+                            <button class="remove-participant" data-participant="${participant}">
+                                Remove
+                            </button>
+                        `
+                    });
+                    
+                    const removeButton = participantEl.querySelector('.remove-participant');
+                    removeButton.addEventListener('click', () => removeParticipant(eventId, participant));
+                    
+                    participantsList.appendChild(participantEl);
+                });
+            } else {
+                participantsList.innerHTML = "<p>No participants yet</p>";
+            }
+        }
+        
+        // Load schedules
+        loadSchedules(eventId);
+        
     } catch (error) {
-        console.error("Error loading event details:", error.message);
+        console.error("Error loading event details:", error);
+        showError("Failed to load event details");
     }
 }
 
-// Setup participant management
-function setupParticipantManagement(user, eventId) {
+// Participant Management
+function setupParticipantForm() {
     const participantForm = document.getElementById("add-participant-form");
     if (participantForm) {
-        participantForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const participantName = document.getElementById("participant-name").value;
-            if (participantName) {
-                try {
-                    await updateDoc(doc(db, `users/${user.uid}/events`, eventId), {
-                        participants: arrayUnion(participantName),
-                    });
-                    alert("Participant added successfully!");
-                    loadParticipants(user, eventId);
-                    participantForm.reset();
-                } catch (error) {
-                    console.error("Error adding participant:", error.message);
-                }
-            } else {
-                alert("Please enter a participant name.");
-            }
-        });
+        participantForm.addEventListener("submit", handleParticipantSubmit);
     }
-
-    loadParticipants(user, eventId);
 }
 
-// Load participants
-async function loadParticipants(user, eventId) {
-    const participantList = document.getElementById("participants-list");
-    if (!participantList) {
-        console.error("Participant list element not found.");
-        return;
-    }
+async function handleParticipantSubmit(event) {
+    event.preventDefault();
+    
+    const participantName = document.getElementById("participant-name").value;
+    if (!participantName) return;
 
-    participantList.innerHTML = "";
     try {
-        const eventDoc = await getDoc(doc(db, `users/${user.uid}/events`, eventId));
-        if (eventDoc.exists()) {
-            const eventData = eventDoc.data();
-            eventData.participants.forEach((participant) => {
-                const participantItem = document.createElement("div");
-                participantItem.textContent = participant;
-                participantList.appendChild(participantItem);
-            });
-        }
+        const eventRef = doc(db, "events", currentEventId);
+        await updateDoc(eventRef, {
+            participants: arrayUnion(participantName)
+        });
+        
+        showSuccess("Participant added successfully");
+        event.target.reset();
+        loadEventDetails(currentEventId);
+        
     } catch (error) {
-        console.error("Error loading participants:", error.message);
+        console.error("Error adding participant:", error);
+        showError("Failed to add participant");
     }
 }
 
-// Setup schedule management
-function setupScheduleManagement(user, eventId) {
+async function removeParticipant(eventId, participantName) {
+    try {
+        const eventRef = doc(db, "events", eventId);
+        await updateDoc(eventRef, {
+            participants: arrayRemove(participantName)
+        });
+        
+        showSuccess("Participant removed successfully");
+        loadEventDetails(eventId);
+        
+    } catch (error) {
+        console.error("Error removing participant:", error);
+        showError("Failed to remove participant");
+    }
+}
+
+// Schedule Management
+function setupScheduleForm() {
     const scheduleForm = document.getElementById("add-schedule-form");
     if (scheduleForm) {
-        scheduleForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const scheduleTitle = document.getElementById("schedule-title").value;
-            const scheduleDate = document.getElementById("schedule-date").value;
-
-            if (scheduleTitle && scheduleDate) {
-                try {
-                    await addDoc(collection(db, `users/${user.uid}/events/${eventId}/schedules`), {
-                        title: scheduleTitle,
-                        date: scheduleDate,
-                    });
-                    alert("Schedule added successfully!");
-                    loadSchedules(user, eventId);
-                    scheduleForm.reset();
-                } catch (error) {
-                    console.error("Error adding schedule:", error.message);
-                }
-            } else {
-                alert("Please fill out all fields.");
-            }
-        });
+        scheduleForm.addEventListener("submit", handleScheduleSubmit);
     }
-
-    loadSchedules(user, eventId);
 }
 
-// Load schedules
-async function loadSchedules(user, eventId) {
-    const schedulesList = document.getElementById("schedules-list");
-    if (!schedulesList) {
-        console.error("Schedules list element not found.");
-        return;
-    }
+async function handleScheduleSubmit(event) {
+    event.preventDefault();
+    
+    const title = document.getElementById("schedule-title").value;
+    const date = document.getElementById("schedule-date").value;
+    
+    if (!title || !date) return;
 
-    schedulesList.innerHTML = "";
     try {
-        const schedulesRef = collection(db, `users/${user.uid}/events/${eventId}/schedules`);
-        const scheduleSnapshot = await getDocs(schedulesRef);
-
-        scheduleSnapshot.forEach((doc) => {
-            const scheduleData = doc.data();
-            const scheduleItem = document.createElement("div");
-            scheduleItem.textContent = `${scheduleData.title} - ${scheduleData.date}`;
-            schedulesList.appendChild(scheduleItem);
-        });
+        const scheduleData = {
+            title,
+            date: new Date(date),
+            createdAt: serverTimestamp()
+        };
+        
+        const eventRef = doc(db, "events", currentEventId);
+        const schedulesRef = collection(eventRef, "schedules");
+        await addDoc(schedulesRef, scheduleData);
+        
+        showSuccess("Schedule added successfully");
+        event.target.reset();
+        loadSchedules(currentEventId);
+        
     } catch (error) {
-        console.error("Error loading schedules:", error.message);
+        console.error("Error adding schedule:", error);
+        showError("Failed to add schedule");
     }
 }
 
-// Logout functionality
-const logoutButton = document.getElementById("logout-button");
-if (logoutButton) {
-    logoutButton.addEventListener("click", async () => {
-        try {
-            await signOut(auth);
-            window.location.href = "login.html";
-        } catch (error) {
-            console.error("Error during logout:", error.message);
+async function loadSchedules(eventId) {
+    const schedulesList = document.getElementById("schedules-list");
+    if (!schedulesList) return;
+
+    try {
+        const eventRef = doc(db, "events", eventId);
+        const schedulesRef = collection(eventRef, "schedules");
+        const q = query(schedulesRef, orderBy("date", "asc"));
+        
+        const querySnapshot = await getDocs(q);
+        
+        schedulesList.innerHTML = "";
+        
+        if (querySnapshot.empty) {
+            schedulesList.innerHTML = "<p>No schedules yet</p>";
+            return;
         }
-    });
+        
+        querySnapshot.forEach((doc) => {
+            const schedule = doc.data();
+            const scheduleDate = schedule.date.toDate();
+            
+            const scheduleEl = createElement('div', {
+                className: 'schedule-item',
+                innerHTML: `
+                    <h4>${schedule.title}</h4>
+                    <p>${scheduleDate.toLocaleString()}</p>
+                    <button class="delete-schedule" data-schedule-id="${doc.id}">
+                        Delete
+                    </button>
+                `
+            });
+            
+            const deleteButton = scheduleEl.querySelector('.delete-schedule');
+            deleteButton.addEventListener('click', () => deleteSchedule(eventId, doc.id));
+            
+            schedulesList.appendChild(scheduleEl);
+        });
+        
+    } catch (error) {
+        console.error("Error loading schedules:", error);
+        showError("Failed to load schedules");
+    }
 }
+
+async function deleteSchedule(eventId, scheduleId) {
+    try {
+        const eventRef = doc(db, "events", eventId);
+        const scheduleRef = doc(collection(eventRef, "schedules"), scheduleId);
+        await deleteDoc(scheduleRef);
+        
+        showSuccess("Schedule deleted successfully");
+        loadSchedules(eventId);
+        
+    } catch (error) {
+        console.error("Error deleting schedule:", error);
+        showError("Failed to delete schedule");
+    }
+}
+
+// Dashboard Summary
+async function loadDashboardSummary() {
+    try {
+        const eventsRef = collection(db, "events");
+        const q = query(eventsRef, where("organizerId", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        
+        let totalEvents = 0;
+        let totalParticipants = 0;
+        let completedSessions = 0;
+        
+        querySnapshot.forEach((doc) => {
+            const event = doc.data();
+            totalEvents++;
+            totalParticipants += event.participants?.length || 0;
+        });
+        
+        // Update dashboard elements
+        updateElement("total-events", totalEvents);
+        updateElement("total-participants", totalParticipants);
+        updateElement("completed-sessions", completedSessions);
+        
+    } catch (error) {
+        console.error("Error loading dashboard summary:", error);
+        showError("Failed to load dashboard summary");
+    }
+}
+
+// Utility Functions
+function createElement(tag, options = {}) {
+    const element = document.createElement(tag);
+    if (options.className) element.className = options.className;
+    if (options.innerHTML) element.innerHTML = options.innerHTML;
+    return element;
+}
+
+function updateElement(id, value) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+}
+
+function showError(message) {
+    // You can implement your preferred error display method
+    alert(message);
+}
+
+function showSuccess(message) {
+    // You can implement your preferred success display method
+    alert(message);
+}
+
+async function handleLogout() {
+    try {
+        await signOut(auth);
+        window.location.href = "login.html";
+    } catch (error) {
+        console.error("Error during logout:", error);
+        showError("Failed to log out");
+    }
+}
+
+// Export functions that need to be accessed from HTML
+window.viewEventDetails = function(eventId) {
+    window.location.href = `event-details.html?eventId=${eventId}`;
+};
