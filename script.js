@@ -91,6 +91,7 @@ async function initializePageFunctionality(currentPage) {
             break;
         case 'create-event.html':
             setupEventForm();
+            loadTrackOptions();         
             break;
     }
 }
@@ -151,19 +152,43 @@ function setupEventForm() {
 async function handleEventSubmit(event) {
     event.preventDefault();
 
+    // Get the current user
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        showError("You must be logged in to create an event");
+        return;
+    }
+
+    // Get submit button to show loading state
+    const submitButton = event.target.querySelector('button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.classList.add('loading');
+    }
+
     const form = event.target;
     const eventName = form.querySelector("#event-name").value;
     const eventDate = form.querySelector("#event-date").value;
     const eventCode = form.querySelector("#event-code").value;
-    const trackName = form.querySelector("#track-name").value;
+    const trackSelect = form.querySelector("#track-name");
+    const trackName = trackSelect.options[trackSelect.selectedIndex].text;
     const trackId = form.querySelector("#track-id").value;
 
     try {
-        // Validate event code
+        // Basic validation
+        if (!eventName || !eventDate || !eventCode || !trackId) {
+            throw new Error("Please fill in all required fields");
+        }
+
+        // Validate event code format (optional)
+        if (!/^[A-Z0-9]{6}$/.test(eventCode)) {
+            throw new Error("Event code must be 6 characters (letters and numbers only)");
+        }
+
+        // Validate event code uniqueness
         const isCodeValid = await validateEventCode(eventCode);
         if (!isCodeValid) {
-            showError("Event code already exists. Please choose another.");
-            return;
+            throw new Error("Event code already exists. Please choose another.");
         }
 
         // Create event
@@ -173,7 +198,7 @@ async function handleEventSubmit(event) {
             track: trackName,
             trackId: trackId,
             organizerId: currentUser.uid,
-            eventCode: eventCode,
+            eventCode: eventCode.toUpperCase(),
             participants: [],
             createdAt: serverTimestamp()
         };
@@ -183,23 +208,41 @@ async function handleEventSubmit(event) {
         showSuccess("Event created successfully!");
         form.reset();
         
-        // Reload data
-        await Promise.all([
-            loadEvents(),
-            loadDashboardSummary()
-        ]);
+        // Redirect to dashboard after short delay
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 1500);
 
     } catch (error) {
         console.error("Error creating event:", error);
-        showError("Failed to create event: " + error.message);
+        showError(error.message);
+    } finally {
+        // Reset button state
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.classList.remove('loading');
+        }
     }
 }
 
+// Updated the success method to use a proper message display
+function showSuccess(message) {
+    const successElement = document.getElementById('success-message');
+    if (successElement) {
+        successElement.textContent = message;
+        successElement.style.display = 'block';
+        setTimeout(() => {
+            successElement.style.display = 'none';
+        }, 5000);
+    } else {
+        alert(message);
+    }
+}
 
 // Event Code Validation
 async function validateEventCode(eventCode) {
     const eventsRef = collection(db, "events");
-    const q = query(eventsRef, where("eventCode", "==", eventCode));
+    const q = query(eventsRef, where("eventCode", "==", eventCode.toUpperCase()));
     const querySnapshot = await getDocs(q);
     return querySnapshot.empty;
 }
@@ -595,3 +638,40 @@ window.handleLogout = handleLogout;
 window.viewEventDetails = function(eventId) {
     window.location.href = `event-details.html?eventId=${eventId}`;
 };
+
+// Track Loading
+async function loadTrackOptions() {
+    const trackSelect = document.getElementById('track-name');
+    const trackIdInput = document.getElementById('track-id');
+    
+    if (!trackSelect) return;
+
+    try {
+        const response = await fetch('custom_tracks.json');
+        const tracks = await response.json();
+        
+        // Clear existing options
+        trackSelect.innerHTML = '<option value="">Select a track</option>';
+        
+        // Sort tracks by name
+        tracks.sort((a, b) => a.name.localeCompare(b.name));
+        
+        tracks.forEach(track => {
+            const option = document.createElement('option');
+            option.value = track.id;
+            option.textContent = `${track.name} - ${track.configuration}`;
+            trackSelect.appendChild(option);
+        });
+        
+        // Add change event listener
+        trackSelect.addEventListener('change', () => {
+            const selectedTrack = tracks.find(t => t.id === trackSelect.value);
+            if (selectedTrack) {
+                trackIdInput.value = selectedTrack.id;
+            }
+        });
+    } catch (error) {
+        console.error('Error loading track data:', error);
+        showError('Failed to load track list. Please try again.');
+    }
+}
