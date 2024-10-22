@@ -21,7 +21,7 @@
     <!-- Dashboard Overview -->
     <section class="dashboard">
         <h1>Welcome, Event Organizer!</h1>
-        <p>Manage events, view participants, and analyze performance.</p>
+        <p>Manage events, participants, and performance.</p>
 
         <!-- Dashboard Summary -->
         <div class="dashboard-summary">
@@ -40,18 +40,7 @@
         </div>
     </section>
 
-    <!-- Event Controls -->
-    <div class="event-controls">
-        <input type="text" id="search-input" placeholder="Search events by name">
-        <select id="filter-status">
-            <option value="">All Statuses</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="in-progress">In-Progress</option>
-            <option value="completed">Completed</option>
-        </select>
-    </div>
-
-    <!-- Event Creation -->
+    <!-- Create Event Section -->
     <section class="create-event">
         <h2>Create New Event</h2>
         <form id="create-event-form">
@@ -60,6 +49,7 @@
             <input type="text" id="event-code" placeholder="Event Code" required>
             <input type="text" id="track-name" placeholder="Track Name" required>
             <input type="text" id="track-id" placeholder="Track ID" required>
+            <input type="text" id="organizer-id" placeholder="Organizer ID" required readonly>
             <button type="submit" class="create-event-button">Create Event</button>
         </form>
     </section>
@@ -69,6 +59,22 @@
         <h2>Your Events</h2>
         <div id="event-container" class="event-container">
             <!-- Event cards will be dynamically added here -->
+        </div>
+    </section>
+
+    <!-- Participant List Section -->
+    <section id="participant-section" class="participant-section" style="display: none;">
+        <h2>Participants for Event: <span id="selected-event-name"></span></h2>
+        <div class="participant-controls">
+            <input type="text" id="search-participant" placeholder="Search participants by name">
+            <select id="filter-participant-status">
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
+        <div id="participant-list" class="participant-list">
+            <!-- Participant list items will be dynamically added here -->
         </div>
     </section>
 

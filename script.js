@@ -19,6 +19,22 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+document.addEventListener('DOMContentLoaded', () => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("User is logged in:", user.email);
+            loadDashboard(user);
+            setupEventCreation(user);
+        } else {
+            console.log("User not logged in, redirecting to login.");
+            window.location.href = "login.html";
+        }
+    });
+
+    // Event search and filter setup
+    document.getElementById('search-participant').addEventListener('input', searchParticipants);
+    document.getElementById('filter-participant-status').addEventListener('change', filterParticipants);
+});
 // Authentication & Dashboard Initialization
 document.addEventListener('DOMContentLoaded', () => {
     const dashboardPage = document.querySelector('.dashboard');
@@ -247,8 +263,15 @@ async function loadParticipants(user, eventId) {
         const participantSnapshot = await getDocs(participantsRef);
         const participantList = document.getElementById("participants-list");
 
+        // Check if the participant list element exists
+        if (!participantList) {
+            console.error("Participant list element not found on the page.");
+            return;
+        }
+
         participantList.innerHTML = ""; // Clear existing list
 
+        // Iterate through participants
         participantSnapshot.forEach((doc) => {
             const participantData = doc.data();
 
@@ -257,6 +280,7 @@ async function loadParticipants(user, eventId) {
             participantItem.classList.add("participant-item");
             participantItem.innerHTML = `
                 <p>${participantData.name}</p>
+                <button onclick="editParticipant('${user.uid}', '${eventId}', '${doc.id}', '${participantData.name}')">Edit</button>
                 <button onclick="removeParticipant('${user.uid}', '${eventId}', '${doc.id}')">Remove</button>
             `;
             participantList.appendChild(participantItem);
@@ -269,25 +293,42 @@ async function loadParticipants(user, eventId) {
 // Add a new participant to an event
 async function addParticipant(user, eventId) {
     const participantName = document.getElementById("participant-name").value;
-    if (participantName.trim() === "") return alert("Please enter a participant name.");
+    if (!participantName.trim()) return alert("Please enter a participant name.");
 
     try {
         await addDoc(collection(db, `users/${user.uid}/events/${eventId}/participants`), {
             name: participantName,
-            registrationDate: new Date().toISOString()
+            registrationDate: new Date().toISOString(),
+            status: "active" // New field for participant status
         });
         console.log("Participant added successfully!");
-        document.getElementById("participant-name").value = "";
+        document.getElementById("participant-name").value = ""; // Clear input field
         loadParticipants(user, eventId); // Refresh participant list
     } catch (error) {
         console.error("Error adding participant:", error.message);
     }
 }
 
+// Edit a participant's name
+async function editParticipant(userId, eventId, participantId, currentName) {
+    const newName = prompt("Edit participant name:", currentName);
+    if (!newName || newName.trim() === currentName) return;
+
+    try {
+        const participantRef = doc(db, `users/${userId}/events/${eventId}/participants`, participantId);
+        await updateDoc(participantRef, { name: newName });
+        console.log("Participant name updated successfully!");
+        loadParticipants({ uid: userId }, eventId); // Refresh participant list
+    } catch (error) {
+        console.error("Error updating participant:", error.message);
+    }
+}
+
 // Remove a participant from an event
 async function removeParticipant(userId, eventId, participantId) {
     try {
-        await deleteDoc(doc(db, `users/${userId}/events/${eventId}/participants`, participantId));
+        const participantRef = doc(db, `users/${userId}/events/${eventId}/participants`, participantId);
+        await deleteDoc(participantRef);
         console.log("Participant removed successfully!");
         loadParticipants({ uid: userId }, eventId); // Refresh participant list
     } catch (error) {
@@ -307,3 +348,48 @@ function setupParticipantManagement(user) {
         });
     }
 }
+
+// Load event details
+async function loadEventDetails(eventId) {
+    const eventTitleElement = document.getElementById("event-title");
+    const eventDescriptionElement = document.getElementById("event-description");
+
+    if (!eventTitleElement || !eventDescriptionElement) {
+        console.error("Event detail elements not found on the page.");
+        return;
+    }
+
+    try {
+        // Fetch event details from Firestore
+        const eventRef = doc(db, `users/${auth.currentUser.uid}/events`, eventId);
+        const eventSnapshot = await getDoc(eventRef);
+
+        if (eventSnapshot.exists()) {
+            const eventData = eventSnapshot.data();
+            eventTitleElement.textContent = eventData.name || "No Title";
+            eventDescriptionElement.textContent = eventData.description || "No Description";
+        } else {
+            console.error("Event does not exist.");
+        }
+    } catch (error) {
+        console.error("Error loading event details:", error.message);
+    }
+}
+
+// Initialize participant management once the user is authenticated
+document.addEventListener("DOMContentLoaded", () => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get("eventId");
+
+            if (eventId) {
+                setupParticipantManagement(user);
+                loadParticipants(user, eventId);
+                loadEventDetails(eventId);
+            }
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+});

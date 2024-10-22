@@ -13,70 +13,42 @@
             <img src="images/logo.png" alt="Chikane Logo" class="logo">
             <ul class="nav-links">
                 <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="#" id="logout-button">Log Out</a></li>
+                <li><a href="login.html" id="logout-button">Log Out</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Event Details Page -->
-    <section class="event-details">
-        <h1 id="event-name">Event Name</h1>
-        <p id="event-date">Event Date: </p>
-        <p id="event-code">Event Code: </p>
-        <p id="track-name">Track: </p>
-
-        <!-- Card Layout for Participants, Details, Schedule -->
-     <!-- Participants Section -->
-     <section class="participants">
-        <h2>Participants</h2>
-        <div id="participants-list" class="participants-list">
-            <!-- Participant items will be dynamically added here -->
-        </div>
-
-        <!-- Add Participant Form -->
-        <form id="add-participant-form">
-            <input type="text" id="participant-name" placeholder="Participant Name" required>
-            <button type="submit">Add Participant</button>
-        </form>
-    </section>
-            <!-- Details Card -->
-            <div class="card" id="details-card">
-                <h2>Event Details</h2>
-                <p><strong>Organizer:</strong> <span id="organizer-id"></span></p>
-                <p><strong>Status:</strong> <span id="event-status"></span></p>
-                <button id="edit-details-button">Edit Details</button>
-            </div>
-
-            <!-- Schedule Card -->
-            <div class="card" id="schedule-card">
-                <h2>Schedule</h2>
-                <div id="schedule-list">
-                    <!-- Schedule items will be listed here -->
-                </div>
-                <button id="add-schedule-item-button">Add Schedule Item</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Modal for Adding Participants -->
-    <div class="modal" id="add-participant-modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Add Participant</h2>
-            <input type="text" id="participant-name" placeholder="Participant Name" required>
-            <input type="text" id="participant-id" placeholder="Participant ID" required>
-            <button id="save-participant-button">Save</button>
-        </div>
+    <!-- Event Header -->
+    <div class="event-header">
+        <h1 id="event-title">Event Title</h1>
+        <p id="event-code">Event Code: 12345</p>
+        <p id="track-name">Track: Sample Track</p>
     </div>
 
-    <!-- Modal for Adding Schedule Items -->
-    <div class="modal" id="add-schedule-item-modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Add Schedule Item</h2>
-            <input type="text" id="schedule-item-name" placeholder="Item Name" required>
-            <input type="datetime-local" id="schedule-item-time" required>
-            <button id="save-schedule-item-button">Save</button>
+    <!-- Card Container -->
+    <div class="card-container">
+        <!-- Participants Section -->
+        <div class="event-card participants-section">
+            <h2>Participants</h2>
+            <div id="participants-list"></div>
+            <form id="add-participant-form">
+                <input type="text" id="participant-name" placeholder="Participant Name">
+                <button type="submit" id="add-participant-button">Add Participant</button>
+            </form>
+        </div>
+
+        <!-- Event Details Card -->
+        <div class="event-card">
+            <h2>Event Details</h2>
+            <p><strong>Organizer:</strong> <span id="organizer-name">Ty</span></p>
+            <p><strong>Status:</strong> <span id="event-status">Upcoming</span></p>
+            <button id="edit-details-button">Edit Details</button>
+        </div>
+
+        <!-- Schedule Section -->
+        <div class="schedule-section">
+            <h2>Schedule</h2>
+            <button id="add-schedule-button">Add Schedule Item</button>
         </div>
     </div>
 
