@@ -107,11 +107,7 @@ function setupEventCreation(user) {
     }
 }
 
-// View event details
-function viewEventDetails(eventId) {
-    window.location.href = `event-details.html?eventId=${eventId}`;
-}
-window.viewEventDetails = viewEventDetails;
+
 
 // Load event details
 async function loadEventDetails(user, eventId) {
