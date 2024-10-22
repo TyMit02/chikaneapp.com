@@ -152,50 +152,46 @@ async function validateEventCode(eventCode) {
 
 // Load Events
 async function loadEvents() {
-    const eventContainer = document.getElementById("event-container");
-    if (!eventContainer) return;
+    const eventsContainer = document.getElementById('eventsContainer');
+    if (!eventsContainer) return;
 
     try {
-        const eventsRef = collection(db, "events");
-        const q = query(
-            eventsRef, 
-            where("organizerId", "==", currentUser.uid),
-            orderBy("date", "desc")
-        );
-        
+        const user = auth.currentUser;
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const eventsRef = collection(db, 'events');
+        const q = query(eventsRef, where("organizerId", "==", user.uid));
         const querySnapshot = await getDocs(q);
-        
-        eventContainer.innerHTML = "";
-        
+
+        const events = [];
         querySnapshot.forEach((doc) => {
-            const event = doc.data();
-            const eventDate = event.date.toDate();
-            
-            const eventCard = createElement('div', {
-                className: 'event-card',
-                innerHTML: `
-                    <h3>${event.name}</h3>
-                    <p>Date: ${eventDate.toLocaleDateString()}</p>
-                    <p>Track: ${event.track}</p>
-                    <p>Event Code: ${event.eventCode}</p>
-                    <p>Participants: ${event.participants?.length || 0}</p>
-                    <button class="view-details-btn" data-event-id="${doc.id}">
-                        View Details
-                    </button>
-                `
+            events.push({
+                id: doc.id,
+                ...doc.data()
             });
-            
-            const viewButton = eventCard.querySelector('.view-details-btn');
-            viewButton.addEventListener('click', () => {
-                window.location.href = `event-details.html?eventId=${doc.id}`;
-            });
-            
-            eventContainer.appendChild(eventCard);
         });
+
+        if (events.length === 0) {
+            eventsContainer.innerHTML = `
+                <div class="no-events-message">
+                    <p>No events found. Create your first event to get started!</p>
+                </div>
+            `;
+            return;
+        }
+
+        sortAndDisplayEvents(events);
 
     } catch (error) {
         console.error("Error loading events:", error);
-        showError("Failed to load events");
+        eventsContainer.innerHTML = `
+            <div class="error-message">
+                <p>Error loading events. Please try again later.</p>
+            </div>
+        `;
     }
 }
 
@@ -530,3 +526,4 @@ document.getElementById('eventFilter')?.addEventListener('change', (e) => {
     
     sortAndDisplayEvents(filteredEvents);
 });
+
