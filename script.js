@@ -489,6 +489,55 @@ async function deleteSchedule(eventId, scheduleId) {
     }
 }
 
+// Load the dashboard data
+async function loadDashboard(user) {
+    try {
+        console.log('Loading dashboard for:', user.email);
+        // Implement the logic to fetch events, financial metrics, etc.
+        // Example: Fetch user events from Firestore
+        const eventsRef = collection(db, `users/${user.uid}/events`);
+        const eventsSnapshot = await getDocs(eventsRef);
+
+        // Render events on the dashboard
+        eventsSnapshot.forEach(doc => {
+            const eventData = doc.data();
+            // Use event data to create event cards
+            renderEventCard(eventData);
+        });
+
+        // Call chart initialization after data is fetched
+        initializeCharts();
+
+    } catch (error) {
+        console.error('Error loading dashboard:', error);
+    }
+}
+
+// Initialize charts (Ensure this is defined)
+function initializeCharts() {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            datasets: [{
+                label: 'Revenue',
+                data: [12, 19, 3, 5, 2, 3, 7],
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                fill: false
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
 // Dashboard Summary
 async function loadDashboardSummary() {
     try {
