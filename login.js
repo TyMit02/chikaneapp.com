@@ -95,3 +95,4 @@ function getErrorMessage(errorCode) {
             return 'An error occurred during login. Please try again.';
     }
 }
+
