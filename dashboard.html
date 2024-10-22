@@ -44,57 +44,47 @@
             </div>
         </div>
 
-        <!-- Financial Overview -->
-        <div class="financial-overview-container">
-            <div class="section-header">
-                <h2>Financial Overview</h2>
-                <div class="time-filter">
-                    <select id="time-period">
-                        <option value="week">Last 7 Days</option>
-                        <option value="month">Last 30 Days</option>
-                        <option value="year">Last Year</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Summary Cards -->
-            <div class="summary-cards">
-                <div class="summary-card">
+        <!-- Collapsible Financial Overview -->
+        <section class="financial-metrics">
+            <button class="collapsible">Financial Overview</button>
+            <div class="financial-content">
+                <div class="financial-card">
                     <h3>Total Revenue</h3>
-                    <p class="amount" id="total-revenue">$0.00</p>
-                    <p class="change positive" id="revenue-change">+0%</p>
+                    <p id="event-total-revenue">$0.00</p>
                 </div>
-                
-                <div class="summary-card">
-                    <h3>Pending Payouts</h3>
-                    <p class="amount" id="pending-payouts">$0.00</p>
-                    <p class="status" id="payout-status">Next payout in 2 days</p>
+                <div class="financial-card">
+                    <h3>Registrations</h3>
+                    <p id="registration-count">0/0</p>
                 </div>
-                
-                <div class="summary-card">
-                    <h3>Active Registrations</h3>
-                    <p class="amount" id="active-registrations">0</p>
-                    <p class="change" id="registration-change">+0%</p>
+                <div class="financial-card">
+                    <h3>Avg. Ticket Price</h3>
+                    <p id="avg-ticket-price">$0.00</p>
                 </div>
-                
-                <div class="summary-card">
-                    <h3>Account Status</h3>
-                    <p class="amount" id="stripe-status">Not Connected</p>
-                    <p class="detail" id="stripe-details"></p>
+                <div class="financial-card">
+                    <h3>Garage Revenue</h3>
+                    <p id="garage-revenue">$0.00</p>
+                </div>
+                <div class="financial-card">
+                    <h3>Add-On Revenue</h3>
+                    <p id="addon-revenue">$0.00</p>
+                </div>
+                <div class="financial-card">
+                    <h3>Refund Amount</h3>
+                    <p id="refund-amount">$0.00</p>
                 </div>
             </div>
+        </section>
 
-            <!-- Revenue Chart -->
-            <div class="revenue-chart-container">
-                <canvas id="revenueChart"></canvas>
-            </div>
-            
-            <!-- Recent Transactions -->
-            <div class="recent-transactions">
-                <h3>Recent Transactions</h3>
-                <div class="transaction-list" id="transaction-list">
-                    <!-- Transactions will be populated here -->
-                </div>
+        <!-- Revenue Chart -->
+        <div class="revenue-chart-container">
+            <canvas id="revenueChart"></canvas>
+        </div>
+        
+        <!-- Recent Transactions -->
+        <div class="recent-transactions">
+            <h3>Recent Transactions</h3>
+            <div class="transaction-list" id="transaction-list">
+                <!-- Transactions will be populated here -->
             </div>
         </div>
 
@@ -152,7 +142,7 @@
             </div>
         </div>
 
-        <!-- Settings Section -->
+        <!-- Organizer Settings -->
         <div id="settings-view" class="view-container">
             <h1>Organizer Settings</h1>
             <div class="settings-grid">

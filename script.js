@@ -30,69 +30,71 @@ const auth = getAuth();
 function displayCurrentUser() {
     const userEmail = getCurrentUserEmail();
     console.log('Currently logged in as:', userEmail);
-    
-    // If you want to display it on the page
-    const userDisplay = document.createElement('div');
-    userDisplay.style.position = 'fixed';
-    userDisplay.style.top = '10px';
-    userDisplay.style.right = '10px';
-    userDisplay.style.padding = '10px';
-    userDisplay.style.background = 'rgba(0,0,0,0.7)';
-    userDisplay.style.color = 'white';
-    userDisplay.style.borderRadius = '5px';
-    userDisplay.textContent = `Logged in as: ${userEmail}`;
-    document.body.appendChild(userDisplay);
 }
 
 // DOM Content Loaded Event Listener
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('Document loaded, initializing auth handler...');
-    
+    console.log('Document loaded, starting initialization...');
+
     try {
-        // Initialize auth handler
+        // Initialize Firebase app and authentication handler
         initializeAuthHandler();
-        
-        // Check if we're on a protected page
+
+        // Get the current page name
         const currentPage = window.location.pathname.split('/').pop() || 'index.html';
         const protectedPages = ['dashboard.html', 'event-details.html', 'create-event.html'];
-        
+
+        // If the current page requires authentication, ensure the user is logged in
         if (protectedPages.includes(currentPage)) {
-            console.log('Protected page detected, verifying auth...');
-            // Ensure user is authenticated
-            await requireAuth();
-            // Show who is logged in
-            displayCurrentUser();
+            console.log(`Accessing protected page: ${currentPage}, verifying auth...`);
+            const user = await requireAuth();
+
+            if (user) {
+                console.log(`User logged in as: ${user.email}`);
+                displayCurrentUser();
+
+                // Initialize page-specific functionality
+                initializePageFunctionality(currentPage, user);
+            } else {
+                console.warn('User not logged in, redirecting to login...');
+                window.location.href = 'login.html';
+                return;
+            }
+        } else {
+            console.log(`Non-protected page detected: ${currentPage}`);
+            initializePageFunctionality(currentPage);
         }
-        
-        // Rest of your initialization code...
-        console.log('Initializing page functionality...');
-        initializePageFunctionality(currentPage);
-        
+
     } catch (error) {
         console.error('Error during initialization:', error);
+        showError('Failed to initialize the application.');
     }
 });
 
-// Initialize page-specific functionality
-async function initializePageFunctionality(currentPage) {
-    const user = getCurrentUser();
-    if (!user) return;
-
-    switch(currentPage) {
+// Initialize page functionality based on the current page
+function initializePageFunctionality(currentPage, user) {
+    switch (currentPage) {
         case 'dashboard.html':
-            await loadEvents();
+            loadDashboard(user);
+            setupEventManagement(user);
+            setupFinancialMetrics(user); // New function for collapsible financial metrics
             break;
+
         case 'event-details.html':
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get('eventId');
+            const eventId = new URLSearchParams(window.location.search).get('eventId');
             if (eventId) {
-                await loadEventDetails(eventId);
+                loadEventDetails(user, eventId);
+                setupParticipantManagement(user, eventId);
+                setupScheduleManagement(user, eventId);
             }
             break;
+
         case 'create-event.html':
-            setupEventForm();
-            loadTrackOptions();         
+            setupEventCreation(user);
             break;
+
+        default:
+            console.log('No specific functionality for this page.');
     }
 }
 
