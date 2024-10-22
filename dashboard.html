@@ -17,6 +17,7 @@
                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="create-event.html">Create Event</a></li>
+                    <li><a href="organizer-portal.html">Organizer Portal</a></li>
                     <li><a href="#" id="logout-button">Log Out</a></li>
                 </ul>
             </div>
@@ -44,7 +45,52 @@
             </div>
         </div>
 
-
+        <div class="financial-overview-container">
+            <div class="section-header">
+                <h2>Financial Overview</h2>
+                <div class="time-filter">
+                    <select id="time-period">
+                        <option value="week">Last 7 Days</option>
+                        <option value="month">Last 30 Days</option>
+                        <option value="year">Last Year</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>Total Revenue</h3>
+                    <p class="amount" id="total-revenue">$0.00</p>
+                    <p class="change positive" id="revenue-change">+0%</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h3>Pending Payouts</h3>
+                    <p class="amount" id="pending-payouts">$0.00</p>
+                    <p class="status" id="payout-status">Next payout in 2 days</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h3>Active Registrations</h3>
+                    <p class="amount" id="active-registrations">0</p>
+                    <p class="change" id="registration-change">+0%</p>
+                </div>
+            </div>
+            
+            <!-- Revenue Chart -->
+            <div class="revenue-chart-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+            
+            <!-- Recent Transactions -->
+            <div class="recent-transactions">
+                <h3>Recent Transactions</h3>
+                <div class="transaction-list" id="transaction-list">
+                    <!-- Transactions will be populated here -->
+                </div>
+            </div>
+        </div>
 
     <footer class="footer">
         <div class="container">
