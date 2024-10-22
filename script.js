@@ -109,7 +109,6 @@ function setupEventCreation(user) {
 
 
 
-
 // View event details
 function viewEventDetails(eventId) {
     window.location.href = `event-details.html?eventId=${eventId}`;
@@ -263,24 +262,25 @@ async function loadEventDetails(user, eventId) {
     }
 }
 
-// Schedule Management
+// Setup schedule management
 function setupScheduleManagement(user, eventId) {
     const addScheduleForm = document.getElementById("add-schedule-form");
-    const scheduleList = document.getElementById("schedule-list");
-
     if (addScheduleForm) {
         addScheduleForm.addEventListener("submit", async (event) => {
             event.preventDefault();
-            const scheduleTitle = document.getElementById("schedule-title").value;
-            const scheduleDate = document.getElementById("schedule-date").value;
+            const scheduleName = document.getElementById("schedule-name").value;
+            const scheduleTime = document.getElementById("schedule-time").value;
+
+            if (scheduleName.trim() === "" || scheduleTime.trim() === "") return alert("Please fill out all schedule fields.");
 
             try {
                 await addDoc(collection(db, `users/${user.uid}/events/${eventId}/schedules`), {
-                    title: scheduleTitle,
-                    date: scheduleDate,
+                    name: scheduleName,
+                    time: scheduleTime,
+                    createdAt: new Date().toISOString(),
                 });
-                alert("Schedule added!");
-                loadSchedules(user, eventId); // Refresh the list of schedules
+                alert("Schedule added successfully!");
+                loadSchedules(user, eventId);
                 addScheduleForm.reset();
             } catch (error) {
                 console.error("Error adding schedule:", error.message);
@@ -288,30 +288,47 @@ function setupScheduleManagement(user, eventId) {
         });
     }
 
-    loadSchedules(user, eventId); // Load schedules on page load
+    loadSchedules(user, eventId);
 }
 
-// Fetch schedules from Firestore
+// Load schedules for an event
 async function loadSchedules(user, eventId) {
-    const scheduleList = document.getElementById("schedule-list");
-    scheduleList.innerHTML = ""; // Clear existing schedules
-
     try {
         const schedulesRef = collection(db, `users/${user.uid}/events/${eventId}/schedules`);
-        const snapshot = await getDocs(schedulesRef);
+        const scheduleSnapshot = await getDocs(schedulesRef);
+        const scheduleList = document.getElementById("schedules-list");
 
-        snapshot.forEach((doc) => {
+        // Ensure that the element exists before modifying it
+        if (!scheduleList) {
+            console.error("Schedule list element not found.");
+            return;
+        }
+
+        scheduleList.innerHTML = ""; // Clear existing list
+
+        scheduleSnapshot.forEach((doc) => {
             const scheduleData = doc.data();
             const scheduleItem = document.createElement("div");
             scheduleItem.classList.add("schedule-item");
             scheduleItem.innerHTML = `
-                <p>${scheduleData.title} - ${new Date(scheduleData.date).toLocaleString()}</p>
-                <button onclick="deleteSchedule('${user.uid}', '${eventId}', '${doc.id}')">Delete</button>
+                <p>${scheduleData.name} - ${scheduleData.time}</p>
+                <button onclick="removeSchedule('${user.uid}', '${eventId}', '${doc.id}')">Remove</button>
             `;
             scheduleList.appendChild(scheduleItem);
         });
     } catch (error) {
         console.error("Error loading schedules:", error.message);
+    }
+}
+
+// Remove a schedule from an event
+async function removeSchedule(userId, eventId, scheduleId) {
+    try {
+        await deleteDoc(doc(db, `users/${userId}/events/${eventId}/schedules`, scheduleId));
+        console.log("Schedule removed successfully!");
+        loadSchedules({ uid: userId }, eventId); // Refresh schedule list
+    } catch (error) {
+        console.error("Error removing schedule:", error.message);
     }
 }
 
@@ -326,18 +343,6 @@ async function deleteSchedule(userId, eventId, scheduleId) {
     }
 }
 
-// Setup schedule management
-function setupScheduleManagement(user) {
-    const addScheduleForm = document.getElementById("add-schedule-form");
-    if (addScheduleForm) {
-        addScheduleForm.addEventListener("submit", (event) => {
-            event.preventDefault();
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get("eventId");
-            addSchedule(user, eventId);
-        });
-    }
-}
 
 // Initialize schedule management
 document.addEventListener('DOMContentLoaded', () => {
