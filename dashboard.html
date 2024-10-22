@@ -3,87 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chikane - Event Organizer Dashboard</title>
+    <title>Chikane - Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar sticky">
-        <div class="container">
-            <img src="images/logo.png" alt="Chikane Logo" class="logo">
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="#" id="logout-button">Log Out</a></li>
-            </ul>
+        <div class="container navbar-content">
+            <div class="logo-container">
+                <img src="images/logo.png" alt="Chikane Logo" class="logo">
+            </div>
+            <div class="nav-links-container">
+                <ul class="nav-links">
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="create-event.html">Create Event</a></li>
+                    <li><a href="#" id="logout-button">Log Out</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 
-    <!-- Dashboard Overview -->
-    <section class="dashboard">
-        <h1>Welcome, Event Organizer!</h1>
-        <p>Manage events, participants, and performance.</p>
-
-        <!-- Dashboard Summary -->
-        <div class="dashboard-summary">
-            <div class="summary-card">
-                <h3>Total Events</h3>
-                <p id="total-events">0</p>
-            </div>
-            <div class="summary-card">
-                <h3>Total Participants</h3>
-                <p id="total-participants">0</p>
-            </div>
-            <div class="summary-card">
-                <h3>Completed Sessions</h3>
-                <p id="completed-sessions">0</p>
+    <!-- Main Content -->
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Your Events</h1>
+            <div class="event-filters">
+                <select id="eventFilter" class="filter-select">
+                    <option value="all">All Events</option>
+                    <option value="upcoming">Upcoming Events</option>
+                    <option value="past">Past Events</option>
+                </select>
             </div>
         </div>
-    </section>
 
-    <!-- Create Event Section -->
-    <section class="create-event">
-        <h2>Create New Event</h2>
-        <form id="create-event-form">
-            <input type="text" id="event-name" placeholder="Event Name" required>
-            <input type="date" id="event-date" required>
-            <input type="text" id="event-code" placeholder="Event Code" required>
-            <input type="text" id="track-name" placeholder="Track Name" required>
-            <input type="text" id="track-id" placeholder="Track ID" required>
-            <input type="text" id="organizer-id" placeholder="Organizer ID" required readonly>
-            <button type="submit" class="create-event-button">Create Event</button>
-        </form>
-    </section>
-
-    <!-- Event List Section -->
-    <section class="event-list">
-        <h2>Your Events</h2>
-        <div id="event-container" class="event-container">
-            <!-- Event cards will be dynamically added here -->
-        </div>
-    </section>
-
-    <!-- Event Details Modal -->
-    <div id="event-details-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeEventDetailsModal()">&times;</span>
-            <h2>Event Details</h2>
-            <p><strong>Event Name:</strong> <span id="modal-event-name"></span></p>
-            <p><strong>Event Code:</strong> <span id="modal-event-code"></span></p>
-            <p><strong>Track Name:</strong> <span id="modal-track-name"></span></p>
-            <p><strong>Organizer ID:</strong> <span id="modal-organizer-id"></span></p>
-            <p><strong>Participants:</strong></p>
-            <ul id="modal-participants-list"></ul>
+        <div class="events-grid" id="eventsContainer">
+            <!-- Events will be dynamically inserted here -->
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <p>&copy; 2024 Chikane. All rights reserved.</p>
         </div>
     </footer>
-
-    <!-- JS Script -->
-    <script src="script.js" type="module"></script>
 </body>
 </html>

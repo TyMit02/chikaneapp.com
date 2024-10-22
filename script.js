@@ -459,3 +459,74 @@ async function handleLogout() {
 window.viewEventDetails = function(eventId) {
     window.location.href = `event-details.html?eventId=${eventId}`;
 };
+
+function sortAndDisplayEvents(events) {
+    const currentDate = new Date();
+    
+    // Add status and sort events
+    const processedEvents = events.map(event => ({
+        ...event,
+        status: new Date(event.date) > currentDate ? 'upcoming' : 'past',
+        dateObj: new Date(event.date)
+    })).sort((a, b) => {
+        // Sort upcoming events first, then by date
+        if (a.status === 'upcoming' && b.status === 'past') return -1;
+        if (a.status === 'past' && b.status === 'upcoming') return 1;
+        return a.dateObj - b.dateObj;
+    });
+
+    const eventsContainer = document.getElementById('eventsContainer');
+    eventsContainer.innerHTML = '';
+
+    processedEvents.forEach(event => {
+        const formattedDate = new Date(event.date).toLocaleDateString();
+        const eventCard = `
+            <div class="event-card">
+                <span class="event-status status-${event.status}">
+                    ${event.status === 'upcoming' ? 'Upcoming' : 'Past'}
+                </span>
+                <h2>${event.name}</h2>
+                <div class="event-info">
+                    <div class="event-detail">
+                        <span class="label">Date:</span>
+                        <span class="value">${formattedDate}</span>
+                    </div>
+                    <div class="event-detail">
+                        <span class="label">Track:</span>
+                        <span class="value">${event.track}</span>
+                    </div>
+                    <div class="event-detail">
+                        <span class="label">Event Code:</span>
+                        <span class="value">${event.eventCode}</span>
+                    </div>
+                    <div class="event-detail">
+                        <span class="label">Participants:</span>
+                        <span class="value">${event.participants ? event.participants.length : 0}</span>
+                    </div>
+                </div>
+                <div class="event-actions">
+                    <a href="event-details.html?eventId=${event.id}" class="view-details-button">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        `;
+        eventsContainer.innerHTML += eventCard;
+    });
+}
+
+// Add event listener for filter changes
+document.getElementById('eventFilter')?.addEventListener('change', (e) => {
+    const filter = e.target.value;
+    const currentDate = new Date();
+    
+    let filteredEvents = [...events]; // Your events array
+    
+    if (filter === 'upcoming') {
+        filteredEvents = events.filter(event => new Date(event.date) > currentDate);
+    } else if (filter === 'past') {
+        filteredEvents = events.filter(event => new Date(event.date) <= currentDate);
+    }
+    
+    sortAndDisplayEvents(filteredEvents);
+});
