@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registration - Chikane</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar sticky">
+        <div class="navbar-content container">
+            <div class="logo-container">
+                <a href="dashboard.html">
+                    <img src="images/logo.png" alt="Chikane Logo" class="logo">
+                </a>
+            </div>
+            <div class="nav-links-container">
+                <ul class="nav-links">
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><button id="logout-button" onclick="handleLogout()">Log Out</button></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Registration Flow Container -->
+    <div id="registration-container" class="registration-container">
+        <!-- Registration flow will be rendered here -->
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div id="error-message" style="display: none;" class="error-alert"></div>
+    <div id="success-message" style="display: none;" class="success-alert"></div>
+
+    <!-- Scripts -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <script type="module" src="auth-handler.js"></script>
+    <script type="module" src="script.js"></script>
+    <script type="module" src="registration.js"></script>
+</body>
+</html>

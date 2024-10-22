@@ -672,3 +672,370 @@ async function loadTrackOptions() {
         showError('Failed to load track list. Please try again.');
     }
 }
+
+// Initialize Charts
+function initializeCharts() {
+    const revenueCtx = document.getElementById('revenueChart')?.getContext('2d');
+    const breakdownCtx = document.getElementById('registrationBreakdownChart')?.getContext('2d');
+    
+    if (revenueCtx) {
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: [], // Will be populated with dates
+                datasets: [{
+                    label: 'Revenue',
+                    data: [], // Will be populated with amounts
+                    borderColor: '#FF4500',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#2e3b4e'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: '#2e3b4e'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    if (breakdownCtx) {
+        new Chart(breakdownCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Standard', 'Early Bird', 'Late Registration'],
+                datasets: [{
+                    data: [], // Will be populated
+                    backgroundColor: ['#FF4500', '#4CAF50', '#2196F3']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+}
+
+// Load Financial Data
+async function loadFinancialData(eventId = null) {
+    try {
+        const userId = getCurrentUser()?.uid;
+        if (!userId) return;
+
+        let query = collection(db, "transactions");
+        
+        if (eventId) {
+            query = query.where("eventId", "==", eventId);
+        }
+        query = query.where("organizerId", "==", userId);
+
+        const querySnapshot = await getDocs(query);
+        const transactions = [];
+        let totalRevenue = 0;
+        let pendingPayouts = 0;
+
+        querySnapshot.forEach((doc) => {
+            const transaction = doc.data();
+            transactions.push({
+                id: doc.id,
+                ...transaction
+            });
+            
+            if (transaction.status === 'completed') {
+                totalRevenue += transaction.amount;
+            } else if (transaction.status === 'pending') {
+                pendingPayouts += transaction.amount;
+            }
+        });
+
+        // Update UI
+        updateFinancialUI(totalRevenue, pendingPayouts, transactions);
+        
+        // Update charts
+        updateCharts(transactions);
+
+    } catch (error) {
+        console.error("Error loading financial data:", error);
+        showError("Failed to load financial data");
+    }
+}
+
+// Continuing from previous financial handlers...
+
+function updateFinancialUI(totalRevenue, pendingPayouts, transactions) {
+    // Update summary cards
+    document.getElementById('total-revenue')?.textContent = formatCurrency(totalRevenue);
+    document.getElementById('pending-payouts')?.textContent = formatCurrency(pendingPayouts);
+    
+    // Update transaction list
+    const transactionList = document.getElementById('transaction-list');
+    const transactionTable = document.getElementById('transaction-tbody');
+    
+    if (transactionList) {
+        transactionList.innerHTML = transactions
+            .slice(0, 5) // Show only last 5 transactions in dashboard
+            .map(transaction => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <span class="transaction-date">${formatDate(transaction.createdAt)}</span>
+                        <span class="transaction-type">${transaction.type}</span>
+                    </div>
+                    <div class="transaction-amount ${transaction.type === 'refund' ? 'negative' : ''}">
+                        ${formatCurrency(transaction.amount)}
+                    </div>
+                </div>
+            `).join('');
+    }
+    
+    if (transactionTable) {
+        transactionTable.innerHTML = transactions.map(transaction => `
+            <tr>
+                <td>${formatDate(transaction.createdAt)}</td>
+                <td>${transaction.participantName}</td>
+                <td>${transaction.type}</td>
+                <td class="${transaction.type === 'refund' ? 'negative' : ''}">${formatCurrency(transaction.amount)}</td>
+                <td>
+                    <span class="status-badge status-${transaction.status}">
+                        ${transaction.status}
+                    </span>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button onclick="viewTransactionDetails('${transaction.id}')" class="action-button">
+                            View
+                        </button>
+                        ${transaction.status === 'completed' ? `
+                            <button onclick="initiateRefund('${transaction.id}')" class="action-button refund">
+                                Refund
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Update event-specific metrics if on event details page
+    if (window.location.pathname.includes('event-details.html')) {
+        updateEventMetrics(transactions);
+    }
+}
+
+// Update Event-specific Metrics
+function updateEventMetrics(transactions) {
+    const eventTransactions = transactions.filter(t => t.eventId === currentEventId);
+    
+    // Calculate metrics
+    const metrics = calculateEventMetrics(eventTransactions);
+    
+    // Update UI elements
+    document.getElementById('event-total-revenue')?.textContent = formatCurrency(metrics.totalRevenue);
+    document.getElementById('registration-count')?.textContent = `${metrics.registrationCount}/${metrics.maxRegistrations}`;
+    document.getElementById('avg-ticket-price')?.textContent = formatCurrency(metrics.avgTicketPrice);
+    document.getElementById('garage-revenue')?.textContent = formatCurrency(metrics.garageRevenue);
+    document.getElementById('addon-revenue')?.textContent = formatCurrency(metrics.addonRevenue);
+    document.getElementById('refund-amount')?.textContent = formatCurrency(metrics.refundAmount);
+}
+
+// Calculate Event Metrics
+function calculateEventMetrics(transactions) {
+    return {
+        totalRevenue: transactions
+            .filter(t => t.status === 'completed' && t.type !== 'refund')
+            .reduce((sum, t) => sum + t.amount, 0),
+        registrationCount: transactions
+            .filter(t => t.type === 'registration' && t.status === 'completed')
+            .length,
+        maxRegistrations: 50, // This should come from event settings
+        avgTicketPrice: calculateAverageTicketPrice(transactions),
+        garageRevenue: transactions
+            .filter(t => t.type === 'garage' && t.status === 'completed')
+            .reduce((sum, t) => sum + t.amount, 0),
+        addonRevenue: transactions
+            .filter(t => t.type === 'addon' && t.status === 'completed')
+            .reduce((sum, t) => sum + t.amount, 0),
+        refundAmount: Math.abs(transactions
+            .filter(t => t.type === 'refund')
+            .reduce((sum, t) => sum + t.amount, 0))
+    };
+}
+
+// Transaction Management Functions
+async function viewTransactionDetails(transactionId) {
+    try {
+        const transaction = await getTransactionDetails(transactionId);
+        showTransactionModal(transaction);
+    } catch (error) {
+        console.error("Error loading transaction details:", error);
+        showError("Failed to load transaction details");
+    }
+}
+
+async function initiateRefund(transactionId) {
+    try {
+        const confirmed = await showConfirmationDialog({
+            title: "Confirm Refund",
+            message: "Are you sure you want to process this refund?",
+            confirmText: "Process Refund",
+            cancelText: "Cancel"
+        });
+
+        if (confirmed) {
+            const refund = await processRefund(transactionId);
+            showSuccess("Refund processed successfully");
+            await loadFinancialData(currentEventId);
+        }
+    } catch (error) {
+        console.error("Error processing refund:", error);
+        showError("Failed to process refund");
+    }
+}
+
+// Utility Functions
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    }).format(amount / 100); // Assuming amounts are stored in cents
+}
+
+function formatDate(timestamp) {
+    return new Date(timestamp).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function calculateAverageTicketPrice(transactions) {
+    const registrations = transactions.filter(t => t.type === 'registration' && t.status === 'completed');
+    if (registrations.length === 0) return 0;
+    return registrations.reduce((sum, t) => sum + t.amount, 0) / registrations.length;
+}
+
+// Export Functions
+window.viewTransactionDetails = viewTransactionDetails;
+window.initiateRefund = initiateRefund;
+
+// Initialize Financial Dashboard
+document.addEventListener('DOMContentLoaded', async function() {
+    // ... (previous initialization code)
+
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    if (currentPage === 'dashboard.html' || currentPage === 'event-details.html') {
+        initializeCharts();
+        await loadFinancialData(currentPage === 'event-details.html' ? currentEventId : null);
+        
+        // Set up time period filter listeners
+        const timePeriodSelect = document.getElementById('time-period');
+        if (timePeriodSelect) {
+            timePeriodSelect.addEventListener('change', () => {
+                loadFinancialData(currentEventId);
+            });
+        }
+        
+        // Set up export button listener
+        const exportButton = document.getElementById('export-financials');
+        if (exportButton) {
+            exportButton.addEventListener('click', () => {
+                exportFinancialReport(currentEventId);
+            });
+        }
+    }
+});
+
+// Add this CSS for the new financial components
+const style = document.createElement('style');
+style.textContent = `
+    .transaction-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px;
+        border-bottom: 1px solid #2e3b4e;
+    }
+
+    .transaction-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .transaction-date {
+        font-size: 0.9rem;
+        color: #8899A6;
+    }
+
+    .transaction-type {
+        font-size: 1.1rem;
+        color: #E6F0FF;
+    }
+
+    .transaction-amount {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .transaction-amount.negative {
+        color: #F44336;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+    }
+
+    .status-completed {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .status-pending {
+        background: #FFC107;
+        color: black;
+    }
+
+    .status-failed {
+        background: #F44336;
+        color: white;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-button {
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.2s;
+    }
+
+    .action-button.refund {
+        background: #F44336;
+        color: white;
+    }
+
+    .action-button:hover {
+        opacity: 0.9;
+    }
+`;
+
+document.head.appendChild(style);

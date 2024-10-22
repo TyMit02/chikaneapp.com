@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizer Settings - Chikane</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar sticky">
+        <!-- ... existing navbar code ... -->
+    </nav>
+
+    <div class="container">
+        <div class="settings-container">
+            <h1>Payment Settings</h1>
+            
+            <div class="stripe-connect-section">
+                <h2>Payment Processing</h2>
+                <p>Connect your Stripe account to receive event registration payments directly.</p>
+                
+                <div class="stripe-status" id="stripeStatus">
+                    <!-- Will show connection status -->
+                </div>
+
+                <div class="stripe-actions">
+                    <button id="connectStripeBtn" class="primary-button">
+                        <img src="stripe-logo.svg" alt="Stripe" />
+                        Connect with Stripe
+                    </button>
+                    
+                    <div class="stripe-info">
+                        <p>Benefits of connecting your Stripe account:</p>
+                        <ul>
+                            <li>Receive payments directly to your bank account</li>
+                            <li>Set your own pricing and refund policies</li>
+                            <li>Full control over your financial data</li>
+                            <li>Access to Stripe's detailed reporting</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pricing-settings">
+                <h2>Default Event Pricing</h2>
+                <p>Set your default pricing tiers for events. These can be customized per event.</p>
+                
+                <form id="defaultPricingForm">
+                    <div class="pricing-tier">
+                        <label>Early Bird Price</label>
+                        <div class="price-input">
+                            <span>$</span>
+                            <input type="number" id="earlyBirdPrice" min="0" step="0.01" />
+                        </div>
+                    </div>
+
+                    <div class="pricing-tier">
+                        <label>Standard Price</label>
+                        <div class="price-input">
+                            <span>$</span>
+                            <input type="number" id="standardPrice" min="0" step="0.01" />
+                        </div>
+                    </div>
+
+                    <div class="pricing-tier">
+                        <label>Late Registration Price</label>
+                        <div class="price-input">
+                            <span>$</span>
+                            <input type="number" id="latePrice" min="0" step="0.01" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="save-button">Save Default Pricing</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="auth-handler.js"></script>
+    <script type="module" src="script.js"></script>
+    <script type="module">
+        import { initStripeConnect } from './stripe-connect.js';
+        document.addEventListener('DOMContentLoaded', initStripeConnect);
+    </script>
+</body>
+</html>
