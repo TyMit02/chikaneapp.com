@@ -492,26 +492,33 @@ async function deleteSchedule(eventId, scheduleId) {
 // Load the dashboard data
 async function loadDashboard(user) {
     try {
-        console.log('Loading dashboard for:', user.email);
-        // Implement the logic to fetch events, financial metrics, etc.
-        // Example: Fetch user events from Firestore
-        const eventsRef = collection(db, `users/${user.uid}/events`);
-        const eventsSnapshot = await getDocs(eventsRef);
+        // Fetch events from Firestore
+        const eventsSnapshot = await getDocs(collection(db, `users/${user.uid}/events`));
 
-        // Render events on the dashboard
-        eventsSnapshot.forEach(doc => {
+        // Check if events container exists
+        const eventsContainer = document.getElementById("eventsContainer");
+        if (!eventsContainer) {
+            console.error("Events container not found.");
+            return;
+        }
+
+        eventsContainer.innerHTML = ""; // Clear existing content
+
+        if (eventsSnapshot.empty) {
+            eventsContainer.innerHTML = "<p>No events found.</p>";
+            return;
+        }
+
+        // Loop through events and render each event card
+        eventsSnapshot.forEach((doc) => {
             const eventData = doc.data();
-            // Use event data to create event cards
-            renderEventCard(eventData);
+            renderEventCard(eventData, doc.id); // Call the function to render event card
         });
-
-        // Call chart initialization after data is fetched
-        initializeCharts();
-
     } catch (error) {
-        console.error('Error loading dashboard:', error);
+        console.error("Error loading dashboard:", error);
     }
 }
+
 
 // Initialize charts (Ensure this is defined)
 function initializeCharts() {
@@ -1134,4 +1141,29 @@ async function deleteEvent(eventId) {
 // Function to view event details
 function viewEventDetails(eventId) {
     window.location.href = `event-details.html?eventId=${eventId}`;
+}
+
+// Function to render an individual event card
+function renderEventCard(eventData, eventId) {
+    // Create event card container
+    const eventCard = document.createElement("div");
+    eventCard.classList.add("event-card");
+
+    // Set inner HTML for the event card
+    eventCard.innerHTML = `
+        <h3>${eventData.name}</h3>
+        <p>Date: ${eventData.date}</p>
+        <p>Code: ${eventData.eventCode}</p>
+        <button onclick="viewEventDetails('${eventId}')">View Details</button>
+        <button onclick="editEvent('${eventId}')">Edit</button>
+        <button onclick="deleteEvent('${eventId}')">Delete</button>
+    `;
+
+    // Append the event card to the container
+    const eventsContainer = document.getElementById("eventsContainer");
+    if (eventsContainer) {
+        eventsContainer.appendChild(eventCard);
+    } else {
+        console.error("Events container not found.");
+    }
 }
