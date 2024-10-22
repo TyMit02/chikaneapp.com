@@ -13,61 +13,50 @@
             <img src="images/logo.png" alt="Chikane Logo" class="logo">
             <ul class="nav-links">
                 <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="login.html" id="logout-button">Log Out</a></li>
+                <li><a href="#" id="logout-button">Log Out</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Event Header -->
-    <div class="event-header">
+    <!-- Event Details -->
+    <section class="event-details">
         <h1 id="event-title">Event Title</h1>
-        <p id="event-code">Event Code: 12345</p>
-        <p id="track-name">Track: Sample Track</p>
-    </div>
-
-    <!-- Card Container -->
-    <div class="card-container">
-        <!-- Participants Section -->
-        <div class="event-card participants-section">
-            <h2>Participants</h2>
-            <div id="participants-list"></div>
-            <form id="add-participant-form">
-                <input type="text" id="participant-name" placeholder="Participant Name">
-                <button type="submit" id="add-participant-button">Add Participant</button>
-            </form>
-        </div>
-
-        <!-- Event Details Card -->
-        <div class="event-card">
-            <h2>Event Details</h2>
-            <p><strong>Organizer:</strong> <span id="organizer-name">Ty</span></p>
-            <p><strong>Status:</strong> <span id="event-status">Upcoming</span></p>
-            <button id="edit-details-button">Edit Details</button>
-        </div>
-
-        <!-- Schedule Management -->
-        <div class="schedule-management">
-            <h2>Schedule</h2>
-            <form id="add-schedule-form">
-                <input type="text" id="schedule-title" placeholder="Schedule Title" required>
-                <input type="datetime-local" id="schedule-date" required>
-                <button type="submit" class="add-schedule-button">Add Schedule</button>
-            </form>
-
-            <!-- Schedule List -->
-            <div id="schedules-list" class="schedule-list">
-                <!-- Schedules will be dynamically added here -->
-            </div>
-        </div>
-    
-        <!-- Event Timeline -->
-        <section class="event-timeline">
-            <h2>Event Timeline</h2>
-            <div id="timeline-container" class="timeline-container">
-                <!-- Timeline items will be dynamically added here -->
-            </div>
-        </section>
+        <p id="event-code">Code: <span id="code-value">N/A</span></p>
+        <p id="track-name">Track: <span id="track-value">N/A</span></p>
+        <p id="organizer-name">Organizer: Ty</p>
     </section>
+
+    <!-- Participants Section -->
+    <section class="participants-section">
+        <h2>Participants</h2>
+        <div id="participants-list" class="participant-list">
+            <!-- Participant items will load here -->
+        </div>
+        <form id="add-participant-form">
+            <input type="text" id="participant-name" placeholder="Participant Name" required>
+            <button type="submit">Add Participant</button>
+        </form>
+    </section>
+
+    <!-- Schedule Management Section -->
+    <section class="schedule-management">
+        <h2>Schedule</h2>
+        <div id="schedules-list" class="schedule-list">
+            <!-- Schedule items will load here -->
+        </div>
+        <form id="add-schedule-form">
+            <input type="text" id="schedule-title" placeholder="Schedule Title" required>
+            <input type="datetime-local" id="schedule-date" required>
+            <button type="submit">Add Schedule</button>
+        </form>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Chikane. All rights reserved.</p>
+        </div>
+    </footer>
 
     <!-- JS Script -->
     <script src="script.js" type="module"></script>

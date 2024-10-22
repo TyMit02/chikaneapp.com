@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chikane - Event Organizer Dashboard</title>
+    <title>Chikane - Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,61 +21,26 @@
     <!-- Dashboard Overview -->
     <section class="dashboard">
         <h1>Welcome, Event Organizer!</h1>
-        <p>Manage events, participants, and performance.</p>
+        <p>Manage events, participants, and schedules.</p>
 
-        <!-- Dashboard Summary -->
-        <div class="dashboard-summary">
-            <div class="summary-card">
-                <h3>Total Events</h3>
-                <p id="total-events">0</p>
+        <!-- Create Event Section -->
+        <section class="create-event">
+            <h2>Create New Event</h2>
+            <form id="create-event-form">
+                <input type="text" id="event-name" placeholder="Event Name" required>
+                <input type="date" id="event-date" required>
+                <input type="text" id="event-description" placeholder="Event Description" required>
+                <button type="submit">Create Event</button>
+            </form>
+        </section>
+
+        <!-- Event List -->
+        <section class="event-list">
+            <h2>Your Events</h2>
+            <div id="event-container">
+                <!-- Event cards will be dynamically added here -->
             </div>
-            <div class="summary-card">
-                <h3>Total Participants</h3>
-                <p id="total-participants">0</p>
-            </div>
-            <div class="summary-card">
-                <h3>Completed Sessions</h3>
-                <p id="completed-sessions">0</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Create Event Section -->
-    <section class="create-event">
-        <h2>Create New Event</h2>
-        <form id="create-event-form">
-            <input type="text" id="event-name" placeholder="Event Name" required>
-            <input type="date" id="event-date" required>
-            <input type="text" id="event-code" placeholder="Event Code" required>
-            <input type="text" id="track-name" placeholder="Track Name" required>
-            <input type="text" id="track-id" placeholder="Track ID" required>
-            <input type="text" id="organizer-id" placeholder="Organizer ID" required readonly>
-            <button type="submit" class="create-event-button">Create Event</button>
-        </form>
-    </section>
-
-    <!-- Event List Section -->
-    <section class="event-list">
-        <h2>Your Events</h2>
-        <div id="event-container" class="event-container">
-            <!-- Event cards will be dynamically added here -->
-        </div>
-    </section>
-
-    <!-- Participant List Section -->
-    <section id="participant-section" class="participant-section" style="display: none;">
-        <h2>Participants for Event: <span id="selected-event-name"></span></h2>
-        <div class="participant-controls">
-            <input type="text" id="search-participant" placeholder="Search participants by name">
-            <select id="filter-participant-status">
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
-        </div>
-        <div id="participant-list" class="participant-list">
-            <!-- Participant list items will be dynamically added here -->
-        </div>
+        </section>
     </section>
 
     <!-- Footer -->
