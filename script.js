@@ -18,17 +18,24 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Wait for DOM to load
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            console.log("User is logged in:", user.email);
-            setupDashboard(user);
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get("eventId");
+
+            if (eventId) {
+                loadEventDetails(user, eventId); // Fetch event details from Firestore
+                setupScheduleManagement(user, eventId);
+                setupParticipantManagement(user, eventId);
+            }
         } else {
-            console.log("User not logged in, redirecting to login.");
             window.location.href = "login.html";
         }
     });
 });
+
 
 // Setup dashboard
 function setupDashboard(user) {
@@ -203,83 +210,140 @@ async function removeParticipant(userId, eventId, participantId) {
     }
 }
 
-// Setup participant management
-function setupParticipantManagement(user) {
+// Participant Management
+function setupParticipantManagement(user, eventId) {
     const addParticipantForm = document.getElementById("add-participant-form");
+    const participantList = document.getElementById("participants-list");
+
     if (addParticipantForm) {
-        addParticipantForm.addEventListener("submit", (event) => {
+        addParticipantForm.addEventListener("submit", async (event) => {
             event.preventDefault();
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get("eventId");
-            addParticipant(user, eventId);
+            const participantName = document.getElementById("participant-name").value;
+
+            if (participantName.trim() === "") return alert("Please enter a participant name.");
+
+            try {
+                await addDoc(collection(db, `users/${user.uid}/events/${eventId}/participants`), {
+                    name: participantName,
+                    registrationDate: new Date().toISOString(),
+                });
+                alert("Participant added!");
+                loadParticipants(user, eventId); // Refresh the list of participants
+                addParticipantForm.reset();
+            } catch (error) {
+                console.error("Error adding participant:", error.message);
+            }
         });
     }
+
+    loadParticipants(user, eventId); // Load participants on page load
 }
 
-// Add schedule to event
-async function addSchedule(user, eventId) {
-    const name = document.getElementById("schedule-name").value;
-    const startTime = document.getElementById("start-time").value;
-    const endTime = document.getElementById("end-time").value;
-    const type = document.getElementById("schedule-type").value;
-    const description = document.getElementById("schedule-description").value;
-
-    if (!name || !startTime || !endTime || !type) {
-        alert("Please fill in all required fields.");
-        return;
-    }
+// Fetch participants from Firestore
+async function loadParticipants(user, eventId) {
+    const participantList = document.getElementById("participants-list");
+    participantList.innerHTML = ""; // Clear existing participants
 
     try {
-        await addDoc(collection(db, `users/${user.uid}/events/${eventId}/schedules`), {
-            name,
-            startTime,
-            endTime,
-            type,
-            description
+        const participantsRef = collection(db, `users/${user.uid}/events/${eventId}/participants`);
+        const snapshot = await getDocs(participantsRef);
+
+        snapshot.forEach((doc) => {
+            const participantData = doc.data();
+            const participantItem = document.createElement("div");
+            participantItem.classList.add("participant-item");
+            participantItem.innerHTML = `
+                <p>${participantData.name}</p>
+                <button onclick="removeParticipant('${user.uid}', '${eventId}', '${doc.id}')">Remove</button>
+            `;
+            participantList.appendChild(participantItem);
         });
-        console.log("Schedule added successfully!");
-        loadSchedules(user, eventId); // Refresh timeline
     } catch (error) {
-        console.error("Error adding schedule:", error.message);
+        console.error("Error loading participants:", error.message);
     }
 }
 
-// Load schedules for event timeline
+// Fetch event details from Firestore
+async function loadEventDetails(user, eventId) {
+    try {
+        const eventRef = doc(db, `users/${user.uid}/events/${eventId}`);
+        const eventDoc = await getDoc(eventRef);
+
+        if (eventDoc.exists()) {
+            const eventData = eventDoc.data();
+            
+            // Set event details on the page
+            document.getElementById("event-title").textContent = eventData.name;
+            document.getElementById("event-description").textContent = eventData.description;
+        } else {
+            console.error("Event not found!");
+        }
+    } catch (error) {
+        console.error("Error loading event details:", error.message);
+    }
+}
+
+// Schedule Management
+function setupScheduleManagement(user, eventId) {
+    const addScheduleForm = document.getElementById("add-schedule-form");
+    const scheduleList = document.getElementById("schedule-list");
+
+    if (addScheduleForm) {
+        addScheduleForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const scheduleTitle = document.getElementById("schedule-title").value;
+            const scheduleDate = document.getElementById("schedule-date").value;
+
+            try {
+                await addDoc(collection(db, `users/${user.uid}/events/${eventId}/schedules`), {
+                    title: scheduleTitle,
+                    date: scheduleDate,
+                });
+                alert("Schedule added!");
+                loadSchedules(user, eventId); // Refresh the list of schedules
+                addScheduleForm.reset();
+            } catch (error) {
+                console.error("Error adding schedule:", error.message);
+            }
+        });
+    }
+
+    loadSchedules(user, eventId); // Load schedules on page load
+}
+
+// Fetch schedules from Firestore
 async function loadSchedules(user, eventId) {
+    const scheduleList = document.getElementById("schedule-list");
+    scheduleList.innerHTML = ""; // Clear existing schedules
+
     try {
         const schedulesRef = collection(db, `users/${user.uid}/events/${eventId}/schedules`);
-        const scheduleSnapshot = await getDocs(schedulesRef);
-        const timelineContainer = document.getElementById("timeline-container");
+        const snapshot = await getDocs(schedulesRef);
 
-        timelineContainer.innerHTML = ""; // Clear existing timeline
-
-        scheduleSnapshot.forEach((doc) => {
+        snapshot.forEach((doc) => {
             const scheduleData = doc.data();
-
-            // Create timeline item
-            const timelineItem = document.createElement("div");
-            timelineItem.classList.add("timeline-item");
-            timelineItem.innerHTML = `
-                <h3>${scheduleData.name} (${scheduleData.type})</h3>
-                <p>${scheduleData.startTime} - ${scheduleData.endTime}</p>
-                <p>${scheduleData.description}</p>
-                <button onclick="editSchedule('${user.uid}', '${eventId}', '${doc.id}')">Edit</button>
+            const scheduleItem = document.createElement("div");
+            scheduleItem.classList.add("schedule-item");
+            scheduleItem.innerHTML = `
+                <p>${scheduleData.title} - ${new Date(scheduleData.date).toLocaleString()}</p>
                 <button onclick="deleteSchedule('${user.uid}', '${eventId}', '${doc.id}')">Delete</button>
             `;
-            timelineContainer.appendChild(timelineItem);
+            scheduleList.appendChild(scheduleItem);
         });
     } catch (error) {
         console.error("Error loading schedules:", error.message);
     }
 }
 
-// Placeholder functions for editing and deleting schedules
-function editSchedule(userId, eventId, scheduleId) {
-    alert(`Edit schedule: ${scheduleId}`);
-}
-
-function deleteSchedule(userId, eventId, scheduleId) {
-    alert(`Delete schedule: ${scheduleId}`);
+// Delete a schedule
+async function deleteSchedule(userId, eventId, scheduleId) {
+    try {
+        await deleteDoc(doc(db, `users/${userId}/events/${eventId}/schedules`, scheduleId));
+        alert("Schedule deleted!");
+        loadSchedules({ uid: userId }, eventId); // Refresh the list of schedules
+    } catch (error) {
+        console.error("Error deleting schedule:", error.message);
+    }
 }
 
 // Setup schedule management

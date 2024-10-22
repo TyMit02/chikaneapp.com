@@ -45,18 +45,20 @@
             <button id="edit-details-button">Edit Details</button>
         </div>
 
-        <!-- Schedule Section -->
-        <section class="schedule-management">
-            <h2>Manage Event Schedule</h2>
+        <!-- Schedule Management -->
+        <div class="schedule-management">
+            <h2>Schedule</h2>
             <form id="add-schedule-form">
-                <input type="text" id="schedule-name" placeholder="Activity Name" required>
-                <input type="time" id="start-time" required>
-                <input type="time" id="end-time" required>
-                <input type="text" id="schedule-type" placeholder="Type (e.g., Race, Break)" required>
-                <textarea id="schedule-description" placeholder="Description"></textarea>
-                <button type="submit">Add to Schedule</button>
+                <input type="text" id="schedule-title" placeholder="Schedule Title" required>
+                <input type="datetime-local" id="schedule-date" required>
+                <button type="submit" class="add-schedule-button">Add Schedule</button>
             </form>
-        </section>
+
+            <!-- Schedule List -->
+            <div id="schedule-list" class="schedule-list">
+                <!-- Schedules will be dynamically added here -->
+            </div>
+        </div>
     
         <!-- Event Timeline -->
         <section class="event-timeline">
