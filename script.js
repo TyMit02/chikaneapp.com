@@ -847,12 +847,35 @@ function updateEventMetrics(transactions) {
     const metrics = calculateEventMetrics(eventTransactions);
     
     // Update UI elements
-    document.getElementById('event-total-revenue')?.textContent = formatCurrency(metrics.totalRevenue);
-    document.getElementById('registration-count')?.textContent = `${metrics.registrationCount}/${metrics.maxRegistrations}`;
-    document.getElementById('avg-ticket-price')?.textContent = formatCurrency(metrics.avgTicketPrice);
-    document.getElementById('garage-revenue')?.textContent = formatCurrency(metrics.garageRevenue);
-    document.getElementById('addon-revenue')?.textContent = formatCurrency(metrics.addonRevenue);
-    document.getElementById('refund-amount')?.textContent = formatCurrency(metrics.refundAmount);
+    const eventTotalRevenueElement = document.getElementById('event-total-revenue');
+    if (eventTotalRevenueElement) {
+        eventTotalRevenueElement.textContent = formatCurrency(metrics.totalRevenue);
+    }
+    
+    const registrationCountElement = document.getElementById('registration-count');
+    if (registrationCountElement) {
+        registrationCountElement.textContent = `${metrics.registrationCount}/${metrics.maxRegistrations}`;
+    }
+    
+    const avgTicketPriceElement = document.getElementById('avg-ticket-price');
+    if (avgTicketPriceElement) {
+        avgTicketPriceElement.textContent = formatCurrency(metrics.avgTicketPrice);
+    }
+    
+    const garageRevenueElement = document.getElementById('garage-revenue');
+    if (garageRevenueElement) {
+        garageRevenueElement.textContent = formatCurrency(metrics.garageRevenue);
+    }
+    
+    const addonRevenueElement = document.getElementById('addon-revenue');
+    if (addonRevenueElement) {
+        addonRevenueElement.textContent = formatCurrency(metrics.addonRevenue);
+    }
+    
+    const refundAmountElement = document.getElementById('refund-amount');
+    if (refundAmountElement) {
+        refundAmountElement.textContent = formatCurrency(metrics.refundAmount);
+    }
 }
 
 // Calculate Event Metrics
