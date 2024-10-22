@@ -128,14 +128,19 @@ async function handleEventSubmit(event) {
         
         showSuccess("Event created successfully!");
         form.reset();
-        loadEvents();
-        updateDashboardSummary();
+        
+        // Reload data
+        await Promise.all([
+            loadEvents(),
+            loadDashboardSummary()
+        ]);
 
     } catch (error) {
         console.error("Error creating event:", error);
         showError("Failed to create event: " + error.message);
     }
 }
+
 
 // Event Code Validation
 async function validateEventCode(eventCode) {
