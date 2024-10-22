@@ -22,11 +22,12 @@ const auth = getAuth(app);
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            console.log("User is logged in:", user.email);
             const urlParams = new URLSearchParams(window.location.search);
             const eventId = urlParams.get("eventId");
 
             if (eventId) {
-                loadEventDetails(user, eventId);
+                setupEventDetails(user, eventId);
                 setupParticipantManagement(user, eventId);
                 setupScheduleManagement(user, eventId);
             } else {
@@ -34,29 +35,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadEvents(user);
             }
         } else {
+            console.log("User not logged in");
             window.location.href = "login.html";
         }
     });
 });
 
-// Event creation
+// Setup event creation
 function setupEventCreation(user) {
     const createEventForm = document.getElementById("create-event-form");
     if (createEventForm) {
         createEventForm.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const name = document.getElementById("event-name").value;
-            const date = document.getElementById("event-date").value;
-            const description = document.getElementById("event-description").value;
+            const eventName = document.getElementById("event-name").value;
+            const eventDate = document.getElementById("event-date").value;
+            const eventDescription = document.getElementById("event-description").value;
 
-            if (name && date && description) {
+            if (eventName && eventDate && eventDescription) {
                 try {
                     await addDoc(collection(db, `users/${user.uid}/events`), {
-                        name,
-                        date,
-                        description,
-                        createdAt: new Date().toISOString()
+                        name: eventName,
+                        date: eventDate,
+                        description: eventDescription,
+                        createdAt: new Date().toISOString(),
                     });
                     alert("Event created successfully!");
                     loadEvents(user);
@@ -77,8 +79,8 @@ async function loadEvents(user) {
         const eventsRef = collection(db, `users/${user.uid}/events`);
         const eventSnapshot = await getDocs(eventsRef);
         const eventContainer = document.getElementById("event-container");
-        eventContainer.innerHTML = "";
 
+        eventContainer.innerHTML = "";
         eventSnapshot.forEach((doc) => {
             const eventData = doc.data();
             const eventCard = document.createElement("div");
@@ -101,6 +103,39 @@ window.viewEventDetails = function(eventId) {
     window.location.href = `event-details.html?eventId=${eventId}`;
 }
 
+// Setup event details page
+function setupEventDetails(user, eventId) {
+    loadEventDetails(user, eventId);
+    setupParticipantManagement(user, eventId);
+    setupScheduleManagement(user, eventId);
+}
+
+// Load event details
+async function loadEventDetails(user, eventId) {
+    const eventTitle = document.getElementById("event-title");
+    const eventCode = document.getElementById("event-code");
+    const trackName = document.getElementById("track-name");
+
+    if (!eventTitle || !eventCode || !trackName) {
+        console.error("Event detail elements not found on the page.");
+        return;
+    }
+
+    try {
+        const eventDoc = await getDoc(doc(db, `users/${user.uid}/events`, eventId));
+        if (eventDoc.exists()) {
+            const eventData = eventDoc.data();
+            eventTitle.textContent = eventData.name;
+            eventCode.textContent = eventData.code || "N/A";
+            trackName.textContent = eventData.track || "N/A";
+        } else {
+            console.error("No such event found.");
+        }
+    } catch (error) {
+        console.error("Error loading event details:", error.message);
+    }
+}
+
 // Setup participant management
 function setupParticipantManagement(user, eventId) {
     const participantForm = document.getElementById("add-participant-form");
@@ -112,7 +147,7 @@ function setupParticipantManagement(user, eventId) {
             if (participantName) {
                 try {
                     await addDoc(collection(db, `users/${user.uid}/events/${eventId}/participants`), {
-                        name: participantName
+                        name: participantName,
                     });
                     alert("Participant added successfully!");
                     loadParticipants(user, eventId);
@@ -125,12 +160,17 @@ function setupParticipantManagement(user, eventId) {
             }
         });
     }
+
+    loadParticipants(user, eventId);
 }
 
 // Load participants
 async function loadParticipants(user, eventId) {
     const participantList = document.getElementById("participants-list");
-    if (!participantList) return;
+    if (!participantList) {
+        console.error("Participant list element not found.");
+        return;
+    }
 
     participantList.innerHTML = "";
     try {
@@ -155,13 +195,14 @@ function setupScheduleManagement(user, eventId) {
         scheduleForm.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const title = document.getElementById("schedule-title").value;
-            const date = document.getElementById("schedule-date").value;
-            if (title && date) {
+            const scheduleTitle = document.getElementById("schedule-title").value;
+            const scheduleDate = document.getElementById("schedule-date").value;
+
+            if (scheduleTitle && scheduleDate) {
                 try {
                     await addDoc(collection(db, `users/${user.uid}/events/${eventId}/schedules`), {
-                        title,
-                        date
+                        title: scheduleTitle,
+                        date: scheduleDate,
                     });
                     alert("Schedule added successfully!");
                     loadSchedules(user, eventId);
@@ -170,16 +211,21 @@ function setupScheduleManagement(user, eventId) {
                     console.error("Error adding schedule:", error.message);
                 }
             } else {
-                alert("All schedule fields are required.");
+                alert("Please fill out all fields.");
             }
         });
     }
+
+    loadSchedules(user, eventId);
 }
 
 // Load schedules
 async function loadSchedules(user, eventId) {
     const schedulesList = document.getElementById("schedules-list");
-    if (!schedulesList) return;
+    if (!schedulesList) {
+        console.error("Schedules list element not found.");
+        return;
+    }
 
     schedulesList.innerHTML = "";
     try {
@@ -195,4 +241,17 @@ async function loadSchedules(user, eventId) {
     } catch (error) {
         console.error("Error loading schedules:", error.message);
     }
+}
+
+// Logout functionality
+const logoutButton = document.getElementById("logout-button");
+if (logoutButton) {
+    logoutButton.addEventListener("click", async () => {
+        try {
+            await signOut(auth);
+            window.location.href = "login.html";
+        } catch (error) {
+            console.error("Error during logout:", error.message);
+        }
+    });
 }
