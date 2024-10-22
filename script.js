@@ -42,21 +42,63 @@ let currentUser = null;
 let currentEventId = null;
 
 // DOM Content Loaded Event Listener
-document.addEventListener('DOMContentLoaded', function() {
-    // Setup view switching
-    const navLinks = document.querySelectorAll('.nav-links a[data-view]');
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const viewName = e.target.dataset.view;
-            switchView(viewName);
+document.addEventListener('DOMContentLoaded', async function() {
+    // Initialize auth handler
+    initializeAuthHandler();
+    
+    try {
+        // Check if we're on a protected page
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        const protectedPages = ['dashboard.html', 'event-details.html', 'create-event.html'];
+        
+        if (protectedPages.includes(currentPage)) {
+            // Ensure user is authenticated
+            await requireAuth();
+        }
+        
+        // Setup view switching
+        const navLinks = document.querySelectorAll('.nav-links a[data-view]');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const viewName = e.target.dataset.view;
+                switchView(viewName);
+            });
         });
-    });
 
-    // Initial view based on hash or default to dashboard
-    const initialView = window.location.hash.slice(1) || 'dashboard';
-    switchView(initialView);
+        // Initialize view based on hash or default to dashboard
+        const initialView = window.location.hash.slice(1) || 'dashboard';
+        switchView(initialView);
+
+        // Initialize page-specific functionality
+        initializePageFunctionality(currentPage);
+    } catch (error) {
+        console.error('Error initializing page:', error);
+        // Auth handler will handle redirects if not authenticated
+    }
 });
+
+// Initialize page-specific functionality
+async function initializePageFunctionality(currentPage) {
+    const user = getCurrentUser();
+    if (!user) return;
+
+    switch(currentPage) {
+        case 'dashboard.html':
+            await loadEvents();
+            break;
+        case 'event-details.html':
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get('eventId');
+            if (eventId) {
+                await loadEventDetails(eventId);
+            }
+            break;
+        case 'create-event.html':
+            setupEventForm();
+            break;
+    }
+}
 
 function switchView(viewName) {
     // Hide all views
@@ -449,8 +491,16 @@ function updateElement(id, value) {
 }
 
 function showError(message) {
-    // You can implement your preferred error display method
-    alert(message);
+    const errorElement = document.getElementById('error-message');
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        setTimeout(() => {
+            errorElement.style.display = 'none';
+        }, 5000);
+    } else {
+        alert(message);
+    }
 }
 
 function showSuccess(message) {
@@ -467,6 +517,7 @@ async function handleLogout() {
         showError("Failed to log out");
     }
 }
+
 
 // Export functions that need to be accessed from HTML
 window.viewEventDetails = function(eventId) {
@@ -544,3 +595,8 @@ document.getElementById('eventFilter')?.addEventListener('change', (e) => {
     sortAndDisplayEvents(filteredEvents);
 });
 
+
+window.handleLogout = handleLogout;
+window.viewEventDetails = function(eventId) {
+    window.location.href = `event-details.html?eventId=${eventId}`;
+};

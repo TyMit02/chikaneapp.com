@@ -1605,3 +1605,28 @@ button:hover, .cta-button:hover, .download-button:hover {
         transform: rotate(360deg);
     }
 }
+
+.error-alert {
+    background-color: rgba(255, 69, 0, 0.1);
+    border-left: 4px solid #FF4500;
+    color: #FF4500;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 1000;
+}
