@@ -1065,3 +1065,107 @@ style.textContent = `
 `;
 
 document.head.appendChild(style);
+
+async function setupEventManagement(user) {
+    console.log('Setting up event management for:', user.email);
+
+    // Load events for the organizer
+    await loadEvents(user);
+
+    // Set up event creation form
+    const createEventForm = document.getElementById("create-event-form");
+    if (createEventForm) {
+        createEventForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            // Gather input values
+            const eventName = document.getElementById("event-name").value;
+            const eventDate = document.getElementById("event-date").value;
+            const eventCode = document.getElementById("event-code").value;
+            const trackName = document.getElementById("track-name").value;
+            const trackId = document.getElementById("track-id").value;
+            
+            // Validate inputs
+            if (!eventName || !eventDate || !eventCode || !trackName || !trackId) {
+                alert("Please fill out all fields.");
+                return;
+            }
+
+            try {
+                // Add event to Firestore under the user's collection
+                await addDoc(collection(db, `users/${user.uid}/events`), {
+                    name: eventName,
+                    date: eventDate,
+                    eventCode: eventCode,
+                    track: trackName,
+                    trackId: trackId,
+                    organizerId: user.uid,
+                    createdAt: serverTimestamp(),
+                    participants: []
+                });
+                
+                alert("Event created successfully!");
+                loadEvents(user); // Reload events
+                createEventForm.reset(); // Clear form fields
+            } catch (error) {
+                console.error("Error creating event:", error);
+                alert("Failed to create event.");
+            }
+        });
+    }
+}
+
+// Function to load events for the organizer
+async function loadEvents(user) {
+    const eventsContainer = document.getElementById("eventsContainer");
+    eventsContainer.innerHTML = ""; // Clear previous events
+
+    try {
+        // Fetch events from Firestore
+        const eventsSnapshot = await getDocs(collection(db, `users/${user.uid}/events`));
+        
+        if (eventsSnapshot.empty) {
+            eventsContainer.innerHTML = "<p>No events found.</p>";
+            return;
+        }
+
+        // Loop through events and display them
+        eventsSnapshot.forEach((doc) => {
+            const eventData = doc.data();
+
+            // Create event card
+            const eventCard = document.createElement("div");
+            eventCard.classList.add("event-card");
+            eventCard.innerHTML = `
+                <h3>${eventData.name}</h3>
+                <p>Date: ${eventData.date}</p>
+                <p>Code: ${eventData.eventCode}</p>
+                <button onclick="viewEventDetails('${doc.id}')">View Details</button>
+                <button onclick="editEvent('${doc.id}')">Edit</button>
+                <button onclick="deleteEvent('${doc.id}')">Delete</button>
+            `;
+            eventsContainer.appendChild(eventCard);
+        });
+    } catch (error) {
+        console.error("Error loading events:", error);
+    }
+}
+
+// Function to delete an event
+async function deleteEvent(eventId) {
+    try {
+        const user = getAuth().currentUser;
+        if (confirm("Are you sure you want to delete this event?")) {
+            await deleteDoc(doc(db, `users/${user.uid}/events`, eventId));
+            alert("Event deleted successfully!");
+            loadEvents(user);
+        }
+    } catch (error) {
+        console.error("Error deleting event:", error);
+    }
+}
+
+// Function to view event details
+function viewEventDetails(eventId) {
+    window.location.href = `event-details.html?eventId=${eventId}`;
+}
