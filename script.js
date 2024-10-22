@@ -780,7 +780,10 @@ function updateFinancialUI(totalRevenue, pendingPayouts, transactions) {
     if (totalRevenueElement) {
         totalRevenueElement.textContent = formatCurrency(totalRevenue);
     }
-    document.getElementById('pending-payouts')?.textContent = formatCurrency(pendingPayouts);
+    const anotherElement = document.getElementById('another-element');
+    if (anotherElement) {
+        anotherElement.textContent = someValue;
+    }
     
     // Update transaction list
     const transactionList = document.getElementById('transaction-list');
