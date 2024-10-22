@@ -17,7 +17,6 @@
                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="create-event.html">Create Event</a></li>
-                    <li><a href="organizer-portal.html">Organizer Portal</a></li>
                     <li><a href="#" id="logout-button">Log Out</a></li>
                 </ul>
             </div>
@@ -45,6 +44,7 @@
             </div>
         </div>
 
+        <!-- Financial Overview -->
         <div class="financial-overview-container">
             <div class="section-header">
                 <h2>Financial Overview</h2>
@@ -76,8 +76,14 @@
                     <p class="amount" id="active-registrations">0</p>
                     <p class="change" id="registration-change">+0%</p>
                 </div>
+                
+                <div class="summary-card">
+                    <h3>Account Status</h3>
+                    <p class="amount" id="stripe-status">Not Connected</p>
+                    <p class="detail" id="stripe-details"></p>
+                </div>
             </div>
-            
+
             <!-- Revenue Chart -->
             <div class="revenue-chart-container">
                 <canvas id="revenueChart"></canvas>
@@ -92,16 +98,115 @@
             </div>
         </div>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Chikane. All rights reserved.</p>
-        </div>
-    </footer>
+        <!-- Subscription Management -->
+        <div id="subscription-view" class="view-container">
+            <h1>Subscription Management</h1>
+            
+            <div class="current-plan">
+                <h2>Current Plan</h2>
+                <div id="current-plan-details" class="plan-details"></div>
+            </div>
 
-    <div id="error-message" style="display: none;" class="error-alert"></div>
-    <div id="loading" style="display: none;" class="loading-spinner">
-        Loading...
+            <div class="pricing-tiers">
+                <div class="pricing-card" data-plan="basic">
+                    <h3>Basic</h3>
+                    <p class="price">$199<span>/month</span></p>
+                    <ul class="features">
+                        <li>2 events per month</li>
+                        <li>Up to 50 participants per event</li>
+                        <li>48h support response</li>
+                        <li>Basic analytics</li>
+                    </ul>
+                    <button onclick="selectPlan('basic')" class="select-plan-btn">Select Plan</button>
+                </div>
+
+                <div class="pricing-card popular" data-plan="pro">
+                    <div class="popular-badge">Most Popular</div>
+                    <h3>Professional</h3>
+                    <p class="price">$399<span>/month</span></p>
+                    <ul class="features">
+                        <li>5 events per month</li>
+                        <li>Up to 150 participants per event</li>
+                        <li>24h support response</li>
+                        <li>Advanced analytics</li>
+                        <li>Custom branding</li>
+                        <li>Export reports</li>
+                    </ul>
+                    <button onclick="selectPlan('pro')" class="select-plan-btn">Select Plan</button>
+                </div>
+
+                <div class="pricing-card" data-plan="enterprise">
+                    <h3>Enterprise</h3>
+                    <p class="price">$999<span>/month</span></p>
+                    <ul class="features">
+                        <li>Unlimited events</li>
+                        <li>Unlimited participants</li>
+                        <li>4h support response</li>
+                        <li>Premium analytics</li>
+                        <li>Custom branding</li>
+                        <li>API access</li>
+                        <li>Dedicated support</li>
+                    </ul>
+                    <button onclick="selectPlan('enterprise')" class="select-plan-btn">Select Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings-view" class="view-container">
+            <h1>Organizer Settings</h1>
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h2>Profile Settings</h2>
+                    <form id="profile-form" class="settings-form">
+                        <div class="form-group">
+                            <label for="org-name">Organization Name</label>
+                            <input type="text" id="org-name" name="org-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="org-email">Contact Email</label>
+                            <input type="email" id="org-email" name="org-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="org-phone">Contact Phone</label>
+                            <input type="tel" id="org-phone" name="org-phone">
+                        </div>
+                        <button type="submit" class="save-button">Save Profile</button>
+                    </form>
+                </div>
+
+                <div class="settings-card">
+                    <h2>Payment Settings</h2>
+                    <div id="stripe-connect-section">
+                        <!-- Stripe connection status and buttons will go here -->
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <h2>Notification Settings</h2>
+                    <form id="notification-form" class="settings-form">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="email-notifications" checked>
+                                Email Notifications
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="sms-notifications">
+                                SMS Notifications
+                            </label>
+                        </div>
+                        <button type="submit" class="save-button">Save Preferences</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Error/Success Messages -->
+    <div id="error-message" style="display: none;" class="error-alert"></div>
+    <div id="success-message" style="display: none;" class="success-alert"></div>
 
     <!-- Scripts -->
     <script type="module" src="auth-handler.js"></script>

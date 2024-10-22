@@ -776,7 +776,10 @@ async function loadFinancialData(eventId = null) {
 
 function updateFinancialUI(totalRevenue, pendingPayouts, transactions) {
     // Update summary cards
-    document.getElementById('total-revenue')?.textContent = formatCurrency(totalRevenue);
+    const totalRevenueElement = document.getElementById('total-revenue');
+    if (totalRevenueElement) {
+        totalRevenueElement.textContent = formatCurrency(totalRevenue);
+    }
     document.getElementById('pending-payouts')?.textContent = formatCurrency(pendingPayouts);
     
     // Update transaction list
