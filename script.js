@@ -24,22 +24,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             console.log("User is logged in:", user.email);
 
+            // Check for 'eventId' parameter in the URL
             const urlParams = new URLSearchParams(window.location.search);
             const eventId = urlParams.get("eventId");
 
             if (eventId) {
+                // Load specific event details
                 loadEventDetails(user, eventId);
                 setupScheduleManagement(user, eventId);
                 setupParticipantManagement(user, eventId);
             } else {
+                // Default dashboard setup
                 setupEventCreation(user);
                 loadEvents(user);
             }
         } else {
-            console.log("User not logged in");
+            console.log("User not logged in, redirecting to login.");
             window.location.href = "login.html";
         }
     });
+
 
     // Logout functionality
     const logoutButton = document.getElementById("logout-button");
@@ -222,69 +226,60 @@ async function removeParticipant(userId, eventId, participantId) {
 
 // Setup event creation form
 function setupEventCreation(user) {
-    document.addEventListener('DOMContentLoaded', () => {
-        const createEventForm = document.getElementById("create-event-form");
+    const createEventForm = document.getElementById("create-event-form");
 
-        if (createEventForm) {
-            createEventForm.addEventListener("submit", async (event) => {
-                event.preventDefault();
+    if (createEventForm) {
+        createEventForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
 
-                // Get input values safely
-                const eventNameInput = document.getElementById("event-name");
-                const eventDateInput = document.getElementById("event-date");
-                const eventDescriptionInput = document.getElementById("event-description");
+            // Get input values
+            const eventName = document.getElementById("event-name").value;
+            const eventDate = document.getElementById("event-date").value;
+            const eventDescription = document.getElementById("event-description").value;
 
-                // Check if inputs exist
-                if (!eventNameInput || !eventDateInput || !eventDescriptionInput) {
-                    console.error("One or more input fields not found.");
-                    return;
-                }
+            // Validate input
+            if (!eventName || !eventDate || !eventDescription) {
+                return alert("Please fill out all fields.");
+            }
 
-                const eventName = eventNameInput.value;
-                const eventDate = eventDateInput.value;
-                const eventDescription = eventDescriptionInput.value;
-
-                // Validate input fields
-                if (!eventName || !eventDate || !eventDescription) {
-                    return alert("Please fill out all event fields.");
-                }
-
-                try {
-                    await addDoc(collection(db, `users/${user.uid}/events`), {
-                        name: eventName,
-                        date: eventDate,
-                        description: eventDescription,
-                        createdAt: new Date().toISOString(),
-                    });
-                    console.log("Event created successfully!");
-                    alert("Event created successfully!");
-                    loadEvents(user);
-                    createEventForm.reset();
-                } catch (error) {
-                    console.error("Error creating event:", error.message);
-                }
-            });
-        } else {
-            console.warn("Create Event form not found.");
-        }
-    });
+            try {
+                // Add event to Firestore
+                await addDoc(collection(db, `users/${user.uid}/events`), {
+                    name: eventName,
+                    date: eventDate,
+                    description: eventDescription,
+                    createdAt: new Date().toISOString(),
+                });
+                console.log("Event created successfully!");
+                alert("Event created successfully!");
+                loadEvents(user); // Reload events
+                createEventForm.reset(); // Clear form
+            } catch (error) {
+                console.error("Error creating event:", error.message);
+                alert(`Error creating event: ${error.message}`);
+            }
+        });
+    } else {
+        console.warn("Create Event form not found.");
+    }
 }
 // Load events for the user
 async function loadEvents(user) {
+    const eventContainer = document.getElementById("event-container");
+    if (!eventContainer) {
+        console.error("Event container not found.");
+        return;
+    }
+    eventContainer.innerHTML = ""; // Clear container
+
     try {
         const eventsRef = collection(db, `users/${user.uid}/events`);
         const eventSnapshot = await getDocs(eventsRef);
-        const eventContainer = document.getElementById("event-container");
-
-        if (!eventContainer) {
-            console.warn("Event container not found.");
-            return;
-        }
-
-        eventContainer.innerHTML = ""; // Clear existing events
 
         eventSnapshot.forEach((doc) => {
             const eventData = doc.data();
+
+            // Create event card
             const eventCard = document.createElement("div");
             eventCard.classList.add("event-card");
             eventCard.innerHTML = `
@@ -301,6 +296,26 @@ async function loadEvents(user) {
 }
 
 // View event details
-function viewEventDetails(eventId) {
-    window.location.href = `event-details.html?eventId=${eventId}`;
+async function viewEventDetails(eventId) {
+    const user = auth.currentUser;
+    if (!user) {
+        console.error("No user found.");
+        return;
+    }
+
+    try {
+        const eventDoc = await getDoc(doc(db, `users/${user.uid}/events`, eventId));
+        if (eventDoc.exists()) {
+            const eventData = eventDoc.data();
+
+            // Display event details
+            document.getElementById("event-title").textContent = eventData.name;
+            document.getElementById("event-date").textContent = eventData.date;
+            document.getElementById("event-description").textContent = eventData.description;
+        } else {
+            console.error("No such event found.");
+        }
+    } catch (error) {
+        console.error("Error loading event details:", error.message);
+    }
 }
