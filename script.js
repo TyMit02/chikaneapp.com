@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 import { getFirestore, doc, collection, addDoc, getDocs, deleteDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
-
 
 // Firebase configuration
 const firebaseConfig = {
@@ -23,38 +22,20 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("User is logged in:", user.email);
-            loadDashboard(user);
-            setupEventCreation(user);
+            setupDashboard(user);
         } else {
             console.log("User not logged in, redirecting to login.");
             window.location.href = "login.html";
         }
     });
-
-    // Event search and filter setup
-    document.getElementById('search-participant').addEventListener('input', searchParticipants);
-    document.getElementById('filter-participant-status').addEventListener('change', filterParticipants);
 });
-// Authentication & Dashboard Initialization
-document.addEventListener('DOMContentLoaded', () => {
-    const dashboardPage = document.querySelector('.dashboard');
-    if (dashboardPage) {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("User is logged in:", user.email);
-                loadDashboard(user);
-            } else {
-                console.log("User not logged in, redirecting to login.");
-                window.location.href = "login.html";
-            }
-        });
-    }
 
-    const createEventForm = document.getElementById("create-event-form");
-    if (createEventForm) {
-        setupEventCreation();
-    }
-});
+// Setup dashboard
+function setupDashboard(user) {
+    loadDashboard(user);
+    setupEventCreation(user);
+    setupParticipantManagement(user);
+}
 
 // Load dashboard data
 async function loadDashboard(user) {
@@ -73,21 +54,19 @@ async function loadDashboard(user) {
             eventCard.innerHTML = `
                 <h3>${eventData.name}</h3>
                 <p>Date: ${eventData.date}</p>
-                <p>Track: ${eventData.track}</p>
                 <button onclick="viewEventDetails('${doc.id}')">View Details</button>
                 <button onclick="editEvent('${doc.id}')">Edit</button>
                 <button onclick="deleteEvent('${doc.id}')">Delete</button>
             `;
             eventContainer.appendChild(eventCard);
         });
-
     } catch (error) {
         console.error("Error loading dashboard:", error.message);
     }
 }
 
 // Setup event creation form
-function setupEventCreation() {
+function setupEventCreation(user) {
     const createEventForm = document.getElementById("create-event-form");
     if (createEventForm) {
         createEventForm.addEventListener("submit", async (event) => {
@@ -148,114 +127,6 @@ async function deleteEvent(eventId) {
 }
 window.deleteEvent = deleteEvent;
 
-// Handle registration
-const registerForm = document.getElementById("register-form");
-if (registerForm) {
-    registerForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const email = document.getElementById("register-email").value;
-        const password = document.getElementById("register-password").value;
-
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            console.log("Registration successful:", userCredential.user);
-            window.location.href = "dashboard.html";
-        } catch (error) {
-            console.error("Registration error:", error.message);
-            alert(`Registration error: ${error.message}`);
-        }
-    });
-}
-
-// Handle login
-const loginForm = document.getElementById("login-form");
-if (loginForm) {
-    loginForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            console.log("Login successful:", userCredential.user);
-            window.location.href = "dashboard.html";
-        } catch (error) {
-            console.error("Login error:", error.message);
-            alert(`Login error: ${error.message}`);
-        }
-    });
-}
-
-// Handle logout
-const logoutButton = document.getElementById("logout-button");
-if (logoutButton) {
-    logoutButton.addEventListener("click", async () => {
-        try {
-            await signOut(auth);
-            console.log("Logout successful!");
-            window.location.href = "login.html";
-        } catch (error) {
-            console.error("Logout error:", error.message);
-        }
-    });
-}
-
-// Check if user is logged in
-document.addEventListener('DOMContentLoaded', () => {
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("User is logged in:", user.email);
-            loadEventDetails(user);
-            setupParticipantManagement(user);
-        } else {
-            console.log("User not logged in, redirecting to login.");
-            window.location.href = "login.html";
-        }
-    });
-
-    // Handle logout
-    const logoutButton = document.getElementById("logout-button");
-    if (logoutButton) {
-        logoutButton.addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                console.log("Logout successful!");
-                window.location.href = "login.html";
-            } catch (error) {
-                console.error("Logout error:", error.message);
-            }
-        });
-    }
-});
-
-// Load event details and participants
-async function loadEventDetails(user) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const eventId = urlParams.get("eventId");
-
-    if (eventId) {
-        try {
-            const eventRef = doc(db, `users/${user.uid}/events`, eventId);
-            const eventSnap = await getDoc(eventRef);
-
-            if (eventSnap.exists()) {
-                const eventData = eventSnap.data();
-                document.getElementById("event-name").textContent = eventData.name;
-                document.getElementById("event-date").textContent = eventData.date;
-                document.getElementById("event-description").textContent = eventData.description;
-
-                loadParticipants(user, eventId);
-            } else {
-                console.error("No event found!");
-            }
-        } catch (error) {
-            console.error("Error loading event details:", error.message);
-        }
-    } else {
-        console.error("Event ID not found in URL.");
-    }
-}
-
 // Load participants for an event
 async function loadParticipants(user, eventId) {
     try {
@@ -263,7 +134,6 @@ async function loadParticipants(user, eventId) {
         const participantSnapshot = await getDocs(participantsRef);
         const participantList = document.getElementById("participants-list");
 
-        // Check if the participant list element exists
         if (!participantList) {
             console.error("Participant list element not found on the page.");
             return;
@@ -271,11 +141,8 @@ async function loadParticipants(user, eventId) {
 
         participantList.innerHTML = ""; // Clear existing list
 
-        // Iterate through participants
         participantSnapshot.forEach((doc) => {
             const participantData = doc.data();
-
-            // Create participant item
             const participantItem = document.createElement("div");
             participantItem.classList.add("participant-item");
             participantItem.innerHTML = `
@@ -290,7 +157,7 @@ async function loadParticipants(user, eventId) {
     }
 }
 
-// Add a new participant to an event
+// Add a participant
 async function addParticipant(user, eventId) {
     const participantName = document.getElementById("participant-name").value;
     if (!participantName.trim()) return alert("Please enter a participant name.");
@@ -299,17 +166,17 @@ async function addParticipant(user, eventId) {
         await addDoc(collection(db, `users/${user.uid}/events/${eventId}/participants`), {
             name: participantName,
             registrationDate: new Date().toISOString(),
-            status: "active" // New field for participant status
+            status: "active"
         });
         console.log("Participant added successfully!");
         document.getElementById("participant-name").value = ""; // Clear input field
-        loadParticipants(user, eventId); // Refresh participant list
+        loadParticipants(user, eventId);
     } catch (error) {
         console.error("Error adding participant:", error.message);
     }
 }
 
-// Edit a participant's name
+// Edit a participant
 async function editParticipant(userId, eventId, participantId, currentName) {
     const newName = prompt("Edit participant name:", currentName);
     if (!newName || newName.trim() === currentName) return;
@@ -318,19 +185,19 @@ async function editParticipant(userId, eventId, participantId, currentName) {
         const participantRef = doc(db, `users/${userId}/events/${eventId}/participants`, participantId);
         await updateDoc(participantRef, { name: newName });
         console.log("Participant name updated successfully!");
-        loadParticipants({ uid: userId }, eventId); // Refresh participant list
+        loadParticipants({ uid: userId }, eventId);
     } catch (error) {
         console.error("Error updating participant:", error.message);
     }
 }
 
-// Remove a participant from an event
+// Remove a participant
 async function removeParticipant(userId, eventId, participantId) {
     try {
         const participantRef = doc(db, `users/${userId}/events/${eventId}/participants`, participantId);
         await deleteDoc(participantRef);
         console.log("Participant removed successfully!");
-        loadParticipants({ uid: userId }, eventId); // Refresh participant list
+        loadParticipants({ uid: userId }, eventId);
     } catch (error) {
         console.error("Error removing participant:", error.message);
     }
@@ -348,48 +215,3 @@ function setupParticipantManagement(user) {
         });
     }
 }
-
-// Load event details
-async function loadEventDetails(eventId) {
-    const eventTitleElement = document.getElementById("event-title");
-    const eventDescriptionElement = document.getElementById("event-description");
-
-    if (!eventTitleElement || !eventDescriptionElement) {
-        console.error("Event detail elements not found on the page.");
-        return;
-    }
-
-    try {
-        // Fetch event details from Firestore
-        const eventRef = doc(db, `users/${auth.currentUser.uid}/events`, eventId);
-        const eventSnapshot = await getDoc(eventRef);
-
-        if (eventSnapshot.exists()) {
-            const eventData = eventSnapshot.data();
-            eventTitleElement.textContent = eventData.name || "No Title";
-            eventDescriptionElement.textContent = eventData.description || "No Description";
-        } else {
-            console.error("Event does not exist.");
-        }
-    } catch (error) {
-        console.error("Error loading event details:", error.message);
-    }
-}
-
-// Initialize participant management once the user is authenticated
-document.addEventListener("DOMContentLoaded", () => {
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get("eventId");
-
-            if (eventId) {
-                setupParticipantManagement(user);
-                loadParticipants(user, eventId);
-                loadEventDetails(eventId);
-            }
-        } else {
-            window.location.href = "login.html";
-        }
-    });
-});
