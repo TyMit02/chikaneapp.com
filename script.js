@@ -14,84 +14,82 @@ import {
     arrayUnion,
     arrayRemove 
 } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
-import { 
-    initializeAuthHandler, 
-    requireAuth, 
-    getCurrentUser, 
-    getCurrentUserEmail 
-} from './auth-handler.js';
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 
-// Get Firebase services
-const db = getFirestore();
-const auth = getAuth();
+// Initialize Firebase services
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser = null;
 
 // Add this to show who is logged in (for debugging)
 function displayCurrentUser() {
-    const userEmail = getCurrentUserEmail();
-    console.log('Currently logged in as:', userEmail);
-    
-    // If you want to display it on the page
-    const userDisplay = document.createElement('div');
-    userDisplay.style.position = 'fixed';
-    userDisplay.style.top = '10px';
-    userDisplay.style.right = '10px';
-    userDisplay.style.padding = '10px';
-    userDisplay.style.background = 'rgba(0,0,0,0.7)';
-    userDisplay.style.color = 'white';
-    userDisplay.style.borderRadius = '5px';
-    userDisplay.textContent = `Logged in as: ${userEmail}`;
-    document.body.appendChild(userDisplay);
+    if (currentUser) {
+        const userEmail = currentUser.email;
+        console.log('Currently logged in as:', userEmail);
+        
+        // Display user email on the page
+        const userDisplay = document.createElement('div');
+        userDisplay.style.position = 'fixed';
+        userDisplay.style.top = '10px';
+        userDisplay.style.right = '10px';
+        userDisplay.style.padding = '10px';
+        userDisplay.style.background = 'rgba(0,0,0,0.7)';
+        userDisplay.style.color = 'white';
+        userDisplay.style.borderRadius = '5px';
+        userDisplay.textContent = `Logged in as: ${userEmail}`;
+        document.body.appendChild(userDisplay);
+    }
 }
 
 // DOM Content Loaded Event Listener
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('Document loaded, initializing auth handler...');
-    
-    try {
-        // Initialize auth handler
-        initializeAuthHandler();
-        
-        // Check if we're on a protected page
-        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-        const protectedPages = ['dashboard.html', 'event-details.html', 'create-event.html'];
-        
-        if (protectedPages.includes(currentPage)) {
-            console.log('Protected page detected, verifying auth...');
-            // Ensure user is authenticated
-            await requireAuth();
-            // Show who is logged in
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Document loaded, initializing auth...');
+
+    // Track authentication state
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            console.log('User is logged in:', user.email);
+
+            // Display current user
             displayCurrentUser();
+
+            // Initialize page functionality based on current page
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const protectedPages = ['dashboard.html', 'event-details.html', 'create-event.html'];
+            
+            if (protectedPages.includes(currentPage)) {
+                console.log('Protected page detected, initializing functionality...');
+                initializePageFunctionality(currentPage);
+            }
+        } else {
+            console.log('User not logged in, redirecting to login...');
+            window.location.href = 'login.html';
         }
-        
-        // Rest of your initialization code...
-        console.log('Initializing page functionality...');
-        initializePageFunctionality(currentPage);
-        
-    } catch (error) {
-        console.error('Error during initialization:', error);
-    }
+    });
 });
 
 // Initialize page-specific functionality
-async function initializePageFunctionality(currentPage) {
-    const user = getCurrentUser();
-    if (!user) return;
-
-    switch(currentPage) {
+function initializePageFunctionality(page) {
+    switch (page) {
+        case 'create-event.html':
+            setupEventCreation();
+            break;
         case 'dashboard.html':
-            await loadEvents();
+            loadEvents();
             break;
         case 'event-details.html':
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get('eventId');
+            const eventId = new URLSearchParams(window.location.search).get('eventId');
             if (eventId) {
-                await loadEventDetails(eventId);
+                loadEventDetails(eventId);
+                setupParticipantManagement(eventId);
+                setupScheduleManagement(eventId);
             }
             break;
-        case 'create-event.html':
-            setupEventForm();
-            break;
+        default:
+            console.log('No specific initialization for this page.');
     }
 }
 
@@ -151,47 +149,40 @@ function setupEventForm() {
 async function handleEventSubmit(event) {
     event.preventDefault();
 
-    const form = event.target;
-    const eventName = form.querySelector("#event-name").value;
-    const eventDate = form.querySelector("#event-date").value;
-    const eventCode = form.querySelector("#event-code").value;
-    const trackName = form.querySelector("#track-name").value;
-    const trackId = form.querySelector("#track-id").value;
+    // Validate user
+    if (!currentUser) {
+        console.error("No user is logged in.");
+        return;
+    }
+
+    // Get form inputs
+    const eventName = document.getElementById("event-name").value;
+    const eventDate = document.getElementById("event-date").value;
+    const trackName = document.getElementById("track-name").value;
+    const trackId = document.getElementById("track-id").value;
+    const eventCode = document.getElementById("event-code").value;
+
+    if (!eventName || !eventDate || !trackName || !trackId || !eventCode) {
+        return alert("Please fill out all fields.");
+    }
 
     try {
-        // Validate event code
-        const isCodeValid = await validateEventCode(eventCode);
-        if (!isCodeValid) {
-            showError("Event code already exists. Please choose another.");
-            return;
-        }
-
-        // Create event
-        const eventData = {
+        // Add event to Firestore
+        await addDoc(collection(db, `users/${currentUser.uid}/events`), {
             name: eventName,
-            date: new Date(eventDate),
+            date: eventDate,
             track: trackName,
             trackId: trackId,
-            organizerId: currentUser.uid,
             eventCode: eventCode,
-            participants: [],
-            createdAt: serverTimestamp()
-        };
-
-        const docRef = await addDoc(collection(db, "events"), eventData);
-        
-        showSuccess("Event created successfully!");
-        form.reset();
-        
-        // Reload data
-        await Promise.all([
-            loadEvents(),
-            loadDashboardSummary()
-        ]);
-
+            organizerId: currentUser.uid,
+            createdAt: serverTimestamp(),
+            participants: []
+        });
+        console.log("Event created successfully!");
+        alert("Event created successfully!");
+        createEventForm.reset();
     } catch (error) {
         console.error("Error creating event:", error);
-        showError("Failed to create event: " + error.message);
     }
 }
 
@@ -204,49 +195,91 @@ async function validateEventCode(eventCode) {
     return querySnapshot.empty;
 }
 
-// Load Events
+// Set up event creation
+function setupEventCreation() {
+    const createEventForm = document.getElementById('create-event-form');
+
+    if (!createEventForm) {
+        console.error('Create Event form not found.');
+        return;
+    }
+
+    createEventForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (!currentUser) {
+            console.error('No user is logged in.');
+            return;
+        }
+
+        const eventName = document.getElementById('event-name').value;
+        const eventDate = document.getElementById('event-date').value;
+        const trackName = document.getElementById('track-name').value;
+        const trackId = document.getElementById('track-id').value;
+
+        // Validate input fields
+        if (!eventName || !eventDate || !trackName || !trackId) {
+            alert('Please fill out all event fields.');
+            return;
+        }
+
+        try {
+            // Add the event to Firestore
+            await addDoc(collection(db, `users/${currentUser.uid}/events`), {
+                name: eventName,
+                date: eventDate,
+                track: trackName,
+                trackId: trackId,
+                organizerId: currentUser.uid,
+                createdAt: serverTimestamp(),
+                participants: [],
+            });
+            console.log('Event created successfully!');
+            alert('Event created successfully!');
+            createEventForm.reset();
+            loadEvents(); // Reload events
+        } catch (error) {
+            console.error('Error creating event:', error.message);
+            alert('Failed to create event. Please try again.');
+        }
+    });
+}
+
+// Load events from Firestore
 async function loadEvents() {
-    const eventsContainer = document.getElementById('eventsContainer');
-    if (!eventsContainer) return;
+    if (!currentUser) return;
 
     try {
-        const user = auth.currentUser;
-        if (!user) {
-            window.location.href = 'login.html';
+        const eventsRef = collection(db, `users/${currentUser.uid}/events`);
+        const eventSnapshot = await getDocs(eventsRef);
+        const eventContainer = document.getElementById('event-container');
+
+        if (!eventContainer) {
+            console.error('Event container not found.');
             return;
         }
 
-        const eventsRef = collection(db, 'events');
-        const q = query(eventsRef, where("organizerId", "==", user.uid));
-        const querySnapshot = await getDocs(q);
+        eventContainer.innerHTML = ''; // Clear existing content
 
-        const events = [];
-        querySnapshot.forEach((doc) => {
-            events.push({
-                id: doc.id,
-                ...doc.data()
-            });
-        });
-
-        if (events.length === 0) {
-            eventsContainer.innerHTML = `
-                <div class="no-events-message">
-                    <p>No events found. Create your first event to get started!</p>
-                </div>
+        eventSnapshot.forEach((doc) => {
+            const eventData = doc.data();
+            const eventCard = document.createElement('div');
+            eventCard.classList.add('event-card');
+            eventCard.innerHTML = `
+                <h3>${eventData.name}</h3>
+                <p>Date: ${new Date(eventData.date).toLocaleDateString()}</p>
+                <button onclick="viewEventDetails('${doc.id}')">View Details</button>
             `;
-            return;
-        }
-
-        sortAndDisplayEvents(events);
-
+            eventContainer.appendChild(eventCard);
+        });
     } catch (error) {
-        console.error("Error loading events:", error);
-        eventsContainer.innerHTML = `
-            <div class="error-message">
-                <p>Error loading events. Please try again later.</p>
-            </div>
-        `;
+        console.error('Error loading events:', error.message);
     }
+}
+
+// View event details
+function viewEventDetails(eventId) {
+    window.location.href = `event-details.html?eventId=${eventId}`;
 }
 
 // Load Event Details

@@ -1631,7 +1631,7 @@ button:hover, .cta-button:hover, .download-button:hover {
     z-index: 1000;
 }
 
-/* Add these styles to your style.css file */
+
 
 .create-event-container {
     max-width: 600px;
@@ -1655,7 +1655,7 @@ button:hover, .cta-button:hover, .download-button:hover {
 
 .event-form label {
     display: block;
-    color: #E6F0FF;
+    color: #000000;
     margin-bottom: 8px;
     font-weight: bold;
 }
