@@ -46,11 +46,26 @@
         </div>
 
         <!-- Schedule Section -->
-        <div class="schedule-section">
-            <h2>Schedule</h2>
-            <button id="add-schedule-button">Add Schedule Item</button>
-        </div>
-    </div>
+        <section class="schedule-management">
+            <h2>Manage Event Schedule</h2>
+            <form id="add-schedule-form">
+                <input type="text" id="schedule-name" placeholder="Activity Name" required>
+                <input type="time" id="start-time" required>
+                <input type="time" id="end-time" required>
+                <input type="text" id="schedule-type" placeholder="Type (e.g., Race, Break)" required>
+                <textarea id="schedule-description" placeholder="Description"></textarea>
+                <button type="submit">Add to Schedule</button>
+            </form>
+        </section>
+    
+        <!-- Event Timeline -->
+        <section class="event-timeline">
+            <h2>Event Timeline</h2>
+            <div id="timeline-container" class="timeline-container">
+                <!-- Timeline items will be dynamically added here -->
+            </div>
+        </section>
+    </section>
 
     <!-- JS Script -->
     <script src="script.js" type="module"></script>

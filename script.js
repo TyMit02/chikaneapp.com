@@ -215,3 +215,98 @@ function setupParticipantManagement(user) {
         });
     }
 }
+
+// Add schedule to event
+async function addSchedule(user, eventId) {
+    const name = document.getElementById("schedule-name").value;
+    const startTime = document.getElementById("start-time").value;
+    const endTime = document.getElementById("end-time").value;
+    const type = document.getElementById("schedule-type").value;
+    const description = document.getElementById("schedule-description").value;
+
+    if (!name || !startTime || !endTime || !type) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
+    try {
+        await addDoc(collection(db, `users/${user.uid}/events/${eventId}/schedules`), {
+            name,
+            startTime,
+            endTime,
+            type,
+            description
+        });
+        console.log("Schedule added successfully!");
+        loadSchedules(user, eventId); // Refresh timeline
+    } catch (error) {
+        console.error("Error adding schedule:", error.message);
+    }
+}
+
+// Load schedules for event timeline
+async function loadSchedules(user, eventId) {
+    try {
+        const schedulesRef = collection(db, `users/${user.uid}/events/${eventId}/schedules`);
+        const scheduleSnapshot = await getDocs(schedulesRef);
+        const timelineContainer = document.getElementById("timeline-container");
+
+        timelineContainer.innerHTML = ""; // Clear existing timeline
+
+        scheduleSnapshot.forEach((doc) => {
+            const scheduleData = doc.data();
+
+            // Create timeline item
+            const timelineItem = document.createElement("div");
+            timelineItem.classList.add("timeline-item");
+            timelineItem.innerHTML = `
+                <h3>${scheduleData.name} (${scheduleData.type})</h3>
+                <p>${scheduleData.startTime} - ${scheduleData.endTime}</p>
+                <p>${scheduleData.description}</p>
+                <button onclick="editSchedule('${user.uid}', '${eventId}', '${doc.id}')">Edit</button>
+                <button onclick="deleteSchedule('${user.uid}', '${eventId}', '${doc.id}')">Delete</button>
+            `;
+            timelineContainer.appendChild(timelineItem);
+        });
+    } catch (error) {
+        console.error("Error loading schedules:", error.message);
+    }
+}
+
+// Placeholder functions for editing and deleting schedules
+function editSchedule(userId, eventId, scheduleId) {
+    alert(`Edit schedule: ${scheduleId}`);
+}
+
+function deleteSchedule(userId, eventId, scheduleId) {
+    alert(`Delete schedule: ${scheduleId}`);
+}
+
+// Setup schedule management
+function setupScheduleManagement(user) {
+    const addScheduleForm = document.getElementById("add-schedule-form");
+    if (addScheduleForm) {
+        addScheduleForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get("eventId");
+            addSchedule(user, eventId);
+        });
+    }
+}
+
+// Initialize schedule management
+document.addEventListener('DOMContentLoaded', () => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("User is logged in:", user.email);
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get("eventId");
+            loadSchedules(user, eventId);
+            setupScheduleManagement(user);
+        } else {
+            console.log("User not logged in, redirecting to login.");
+            window.location.href = "login.html";
+        }
+    });
+});
