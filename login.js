@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
 import { 
     getAuth, 
-    signInWithEmailAndPassword,
-    onAuthStateChanged 
+    signInWithEmailAndPassword 
 } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+import { initializeAuthHandler } from './auth-handler.js';
 
 const firebaseConfig = {
     apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
@@ -19,14 +19,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Check auth state
-onAuthStateChanged(auth, (user) => {
-    if (user && window.location.pathname.includes('login.html')) {
-        window.location.href = 'dashboard.html';
-    }
-});
-
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize auth handler
+    initializeAuthHandler();
+
     const loginForm = document.getElementById('login-form');
     const errorElement = document.getElementById('login-error');
     const loginButton = document.querySelector('.login-button');
@@ -36,26 +32,48 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             // Reset error message
-            errorElement.style.display = 'none';
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
             
             // Disable button and show loading state
-            loginButton.disabled = true;
-            loginButton.classList.add('loading');
+            if (loginButton) {
+                loginButton.disabled = true;
+                loginButton.classList.add('loading');
+            }
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('email')?.value;
+            const password = document.getElementById('password')?.value;
+
+            if (!email || !password) {
+                showError('Please enter both email and password');
+                resetButton();
+                return;
+            }
             
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = 'dashboard.html';
+                // Successful login - auth handler will handle redirect
             } catch (error) {
                 console.error("Login error:", error);
-                errorElement.textContent = getErrorMessage(error.code);
-                errorElement.style.display = 'block';
-                loginButton.disabled = false;
-                loginButton.classList.remove('loading');
+                showError(getErrorMessage(error.code));
+                resetButton();
             }
         });
+    }
+
+    function showError(message) {
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+    }
+
+    function resetButton() {
+        if (loginButton) {
+            loginButton.disabled = false;
+            loginButton.classList.remove('loading');
+        }
     }
 });
 
@@ -69,6 +87,10 @@ function getErrorMessage(errorCode) {
             return 'No account found with this email';
         case 'auth/wrong-password':
             return 'Incorrect password';
+        case 'auth/too-many-requests':
+            return 'Too many login attempts. Please try again later.';
+        case 'auth/network-request-failed':
+            return 'Network error. Please check your connection.';
         default:
             return 'An error occurred during login. Please try again.';
     }

@@ -28,6 +28,7 @@ export function initializeAuthHandler() {
     const currentPage = getCurrentPage();
     
     onAuthStateChanged(auth, (user) => {
+        console.log('Auth state changed:', user ? 'logged in' : 'logged out');
         if (user) {
             // User is logged in
             if (authPages.includes(currentPage)) {
@@ -50,8 +51,10 @@ export function requireAuth() {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             unsubscribe();
             if (user) {
+                console.log('User authenticated:', user.email);
                 resolve(user);
             } else {
+                console.log('User not authenticated');
                 reject(new Error('Not authenticated'));
                 window.location.href = 'login.html';
             }
@@ -67,4 +70,14 @@ export function isLoggedIn() {
 // Get current user
 export function getCurrentUser() {
     return auth.currentUser;
+}
+
+// Get current user email
+export function getCurrentUserEmail() {
+    return auth.currentUser?.email || 'Not logged in';
+}
+
+// Add logout function
+export function logout() {
+    return auth.signOut();
 }

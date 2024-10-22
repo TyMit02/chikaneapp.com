@@ -15,11 +15,13 @@ import {
     arrayUnion,
     arrayRemove 
 } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 import { 
-    getAuth, 
-    onAuthStateChanged, 
-    signOut 
-} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+    initializeAuthHandler, 
+    requireAuth, 
+    getCurrentUser, 
+    getCurrentUserEmail 
+} from './auth-handler.js';
 
 // Initialize Firebase with your config
 const firebaseConfig = {
@@ -37,44 +39,50 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// State management
-let currentUser = null;
-let currentEventId = null;
+// Add this to show who is logged in (for debugging)
+function displayCurrentUser() {
+    const userEmail = getCurrentUserEmail();
+    console.log('Currently logged in as:', userEmail);
+    
+    // If you want to display it on the page
+    const userDisplay = document.createElement('div');
+    userDisplay.style.position = 'fixed';
+    userDisplay.style.top = '10px';
+    userDisplay.style.right = '10px';
+    userDisplay.style.padding = '10px';
+    userDisplay.style.background = 'rgba(0,0,0,0.7)';
+    userDisplay.style.color = 'white';
+    userDisplay.style.borderRadius = '5px';
+    userDisplay.textContent = `Logged in as: ${userEmail}`;
+    document.body.appendChild(userDisplay);
+}
 
 // DOM Content Loaded Event Listener
 document.addEventListener('DOMContentLoaded', async function() {
-    // Initialize auth handler
-    initializeAuthHandler();
+    console.log('Document loaded, initializing auth handler...');
     
     try {
+        // Initialize auth handler
+        initializeAuthHandler();
+        
         // Check if we're on a protected page
         const currentPage = window.location.pathname.split('/').pop() || 'index.html';
         const protectedPages = ['dashboard.html', 'event-details.html', 'create-event.html'];
         
         if (protectedPages.includes(currentPage)) {
+            console.log('Protected page detected, verifying auth...');
             // Ensure user is authenticated
             await requireAuth();
+            // Show who is logged in
+            displayCurrentUser();
         }
         
-        // Setup view switching
-        const navLinks = document.querySelectorAll('.nav-links a[data-view]');
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const viewName = e.target.dataset.view;
-                switchView(viewName);
-            });
-        });
-
-        // Initialize view based on hash or default to dashboard
-        const initialView = window.location.hash.slice(1) || 'dashboard';
-        switchView(initialView);
-
-        // Initialize page-specific functionality
+        // Rest of your initialization code...
+        console.log('Initializing page functionality...');
         initializePageFunctionality(currentPage);
+        
     } catch (error) {
-        console.error('Error initializing page:', error);
-        // Auth handler will handle redirects if not authenticated
+        console.error('Error during initialization:', error);
     }
 });
 
