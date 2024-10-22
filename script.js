@@ -541,10 +541,7 @@ function showError(message) {
     }
 }
 
-function showSuccess(message) {
-    // You can implement your preferred success display method
-    alert(message);
-}
+
 
 async function handleLogout() {
     try {
