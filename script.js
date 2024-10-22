@@ -109,6 +109,7 @@ function setupEventCreation(user) {
 
 
 
+
 // View event details
 function viewEventDetails(eventId) {
     window.location.href = `event-details.html?eventId=${eventId}`;
@@ -325,6 +326,18 @@ async function deleteSchedule(userId, eventId, scheduleId) {
     }
 }
 
+// Setup schedule management
+function setupScheduleManagement(user) {
+    const addScheduleForm = document.getElementById("add-schedule-form");
+    if (addScheduleForm) {
+        addScheduleForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get("eventId");
+            addSchedule(user, eventId);
+        });
+    }
+}
 
 // Initialize schedule management
 document.addEventListener('DOMContentLoaded', () => {
