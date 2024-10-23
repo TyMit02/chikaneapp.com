@@ -20,17 +20,17 @@
 
     <!-- Main Content -->
     <div class="container">
-        <!-- Event Title Card -->
-        <div class="event-title-card">
-            <h1 id="event-title">Hola</h1>
+        <!-- Event Header Section -->
+        <div class="event-header">
+            <h1 id="event-title">Event Title</h1>
             <div class="event-info-grid">
                 <div class="info-item">
                     <span class="label">Code:</span>
-                    <span class="value" id="code-value">hola</span>
+                    <span class="value" id="code-value">N/A</span>
                 </div>
                 <div class="info-item">
                     <span class="label">Track:</span>
-                    <span class="value" id="track-value">Eagles Canyon</span>
+                    <span class="value" id="track-value">N/A</span>
                 </div>
                 <div class="info-item">
                     <span class="label">Date:</span>
@@ -38,135 +38,164 @@
                 </div>
             </div>
         </div>
+
+        <!-- Financial Overview Section -->
         <div class="event-financials-container">
             <div class="section-header">
                 <h2>Event Financials</h2>
-                <button class="export-button" id="export-financials">
-                    Export Report
-                </button>
+                <button class="export-button" id="export-financials">Export Report</button>
             </div>
-            
-            <!-- Event Financial Summary -->
+
+            <!-- Financial Summary -->
             <div class="financial-summary">
                 <div class="summary-row">
                     <div class="metric-card">
                         <h3>Total Revenue</h3>
                         <p class="amount" id="event-total-revenue">$0.00</p>
                     </div>
-                    
                     <div class="metric-card">
                         <h3>Registrations</h3>
                         <p class="amount" id="registration-count">0/50</p>
                     </div>
-                    
                     <div class="metric-card">
                         <h3>Average Ticket Price</h3>
                         <p class="amount" id="avg-ticket-price">$0.00</p>
                     </div>
                 </div>
-                
                 <div class="summary-row">
                     <div class="metric-card">
                         <h3>Garage Revenue</h3>
                         <p class="amount" id="garage-revenue">$0.00</p>
                     </div>
-                    
                     <div class="metric-card">
                         <h3>Add-on Revenue</h3>
                         <p class="amount" id="addon-revenue">$0.00</p>
                     </div>
-                    
                     <div class="metric-card">
                         <h3>Refunds</h3>
                         <p class="amount negative" id="refund-amount">$0.00</p>
                     </div>
                 </div>
             </div>
-            
-            <!-- Registration Breakdown -->
-            <div class="registration-breakdown">
-                <h3>Registration Breakdown</h3>
-                <div class="breakdown-chart-container">
-                    <canvas id="registrationBreakdownChart"></canvas>
+        </div>
+
+        <!-- Run Group Management Section -->
+        <div id="run-groups-view" class="run-groups-container">
+            <!-- Header -->
+            <div class="section-header">
+                <h2>Run Group Management</h2>
+                <div class="action-buttons">
+                    <button onclick="createNewGroup()" class="action-button">Create Group</button>
+                    <button onclick="autoBalanceGroups()" class="action-button">Auto Balance</button>
                 </div>
             </div>
-            
-            <!-- Transaction History -->
-            <div class="transaction-history">
-                <h3>Transaction History</h3>
-                <table id="transaction-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Participant</th>
-                            <th>Type</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transaction-tbody">
-                        <!-- Transactions will be populated here -->
-                    </tbody>
-                </table>
+
+            <!-- Groups Grid -->
+            <div class="grid-container" id="run-groups-grid">
+                <!-- Individual Run Groups will be dynamically added here -->
+            </div>
+
+            <!-- Create/Edit Group Modal -->
+            <div id="group-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2 id="modal-title">Create Run Group</h2>
+                    
+                    <!-- Group Modal Form -->
+                    <div class="modal-form">
+                        <div class="form-group">
+                            <label for="group-name">Group Name</label>
+                            <input type="text" id="group-name" placeholder="e.g., Advanced, Intermediate, Novice">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="group-color">Color Code</label>
+                            <select id="group-color">
+                                <option value="red">Red</option>
+                                <option value="yellow">Yellow</option>
+                                <option value="green">Green</option>
+                                <option value="blue">Blue</option>
+                                <option value="purple">Purple</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="group-experience">Experience Level Required</label>
+                            <select id="group-experience">
+                                <option value="novice">Novice (0-2 track days)</option>
+                                <option value="intermediate">Intermediate (3-10 track days)</option>
+                                <option value="advanced">Advanced (11+ track days)</option>
+                                <option value="expert">Expert (Competition License)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="group-max">Maximum Participants</label>
+                            <input type="number" id="group-max" placeholder="25">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Requirements</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" id="require-instructor"> Instructor Required</label>
+                                <label><input type="checkbox" id="require-safety"> Safety Equipment Check</label>
+                                <label><input type="checkbox" id="require-timing"> Timing Required</label>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button onclick="closeModal()" class="cancel-button">Cancel</button>
+                            <button onclick="saveGroup()" class="save-button">Save Group</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- Content Grid -->
-        <div class="content-grid">
-            <!-- Participants Section -->
-            <div class="content-card">
-                <h2>Participants <span class="count">0 Participants</span></h2>
-                <div class="card-content">
-                    <div id="participants-list" class="list-container">
-                        <p class="empty-state">No participants yet</p>
-                    </div>
-                    <div class="card-form">
-                        <div class="input-group">
-                            <input type="text" id="participant-name" placeholder="Participant Name">
-                            <button class="action-button">Add Participant</button>
-                        </div>
+
+        <!-- Participants Section -->
+        <div class="content-card">
+            <h2>Participants <span class="count">0 Participants</span></h2>
+            <div class="card-content">
+                <div id="participants-list" class="list-container">
+                    <p class="empty-state">No participants yet</p>
+                </div>
+                <div class="card-form">
+                    <div class="input-group">
+                        <input type="text" id="participant-name" placeholder="Participant Name">
+                        <button onclick="addParticipant()" class="action-button">Add Participant</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Details Section -->
-            <div class="content-card">
-                <h2>Details</h2>
-                <div class="card-content">
-                    <div class="details-list">
-                        <div class="detail-item">
-                            <span class="label">Organizer:</span>
-                            <span class="value">N/A</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Track Configuration:</span>
-                            <span class="value">N/A</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Start Time:</span>
-                            <span class="value">N/A</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Event Type:</span>
-                            <span class="value">N/A</span>
-                        </div>
+        <!-- Details Section -->
+        <div class="content-card">
+            <h2>Details</h2>
+            <div class="card-content">
+                <div class="details-list">
+                    <div class="detail-item">
+                        <span class="label">Organizer:</span>
+                        <span class="value" id="organizer-name">N/A</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Track Configuration:</span>
+                        <span class="value" id="track-config">N/A</span>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Schedule Section -->
-            <div class="content-card">
-                <h2>Schedule</h2>
-                <div class="card-content">
-                    <div id="schedules-list" class="list-container">
-                        <p class="empty-state">No schedules yet</p>
-                    </div>
-                    <div class="card-form">
-                        <div class="input-group">
-                            <input type="text" id="schedule-title" placeholder="Schedule Title">
-                            <input type="datetime-local" id="schedule-date">
-                            <button class="action-button">Add Schedule</button>
-                        </div>
+        <!-- Schedule Section -->
+        <div class="content-card">
+            <h2>Schedule</h2>
+            <div class="card-content">
+                <div id="schedules-list" class="list-container">
+                    <p class="empty-state">No schedules yet</p>
+                </div>
+                <div class="card-form">
+                    <div class="input-group">
+                        <input type="text" id="schedule-title" placeholder="Schedule Title">
+                        <input type="datetime-local" id="schedule-date">
+                        <button onclick="addSchedule()" class="action-button">Add Schedule</button>
                     </div>
                 </div>
             </div>
