@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chikane - Waiver Management</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar sticky">
+        <div class="container navbar-content">
+            <div class="logo-container">
+                <img src="images/logo.png" alt="Chikane Logo" class="logo">
+            </div>
+            <div class="nav-links-container">
+                <ul class="nav-links">
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="create-event.html">Create Event</a></li>
+                    <li><a href="#" id="logout-button">Log Out</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div id="main-content">
+        <div class="container">
+            <!-- Header Section -->
+            <div class="page-header">
+                <h1>Waiver Management</h1>
+                <button id="create-template-btn" class="primary-button">
+                    Create New Template
+                </button>
+            </div>
+
+            <!-- Waiver Management Sections -->
+            <div class="waiver-grid">
+                <!-- Templates Section -->
+                <div class="waiver-section">
+                    <div class="section-header">
+                        <h2>Waiver Templates</h2>
+                        <div class="header-actions">
+                            <select id="template-filter" class="filter-select">
+                                <option value="all">All Templates</option>
+                                <option value="active">Active</option>
+                                <option value="draft">Drafts</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="templates-container" class="templates-grid">
+                        <!-- Templates will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Signed Waivers Section -->
+                <div class="waiver-section">
+                    <div class="section-header">
+                        <h2>Signed Waivers</h2>
+                        <div class="header-actions">
+                            <select id="event-filter" class="filter-select">
+                                <option value="all">All Events</option>
+                                <!-- Events will be populated here -->
+                            </select>
+                        </div>
+                    </div>
+                    <div id="signed-waivers-container" class="waivers-list">
+                        <!-- Signed waivers will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Contacts Section -->
+            <div class="waiver-section full-width">
+                <div class="section-header">
+                    <h2>Emergency Contacts</h2>
+                    <div class="header-actions">
+                        <button id="export-contacts" class="secondary-button">
+                            Export Contacts
+                        </button>
+                    </div>
+                </div>
+                <div class="contacts-table-container">
+                    <table id="emergency-contacts-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Participant</th>
+                                <th>Contact Name</th>
+                                <th>Relationship</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Emergency contacts will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Creation Modal -->
+    <div id="template-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Waiver Template</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="template-form">
+                    <div class="form-group">
+                        <label for="template-name">Template Name</label>
+                        <input type="text" id="template-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="template-content">Waiver Content</label>
+                        <textarea id="template-content" rows="10" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Required Fields</label>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="required-fields" value="dob">
+                                Date of Birth
+                            </label>
+                            <label>
+                                <input type="checkbox" name="required-fields" value="address">
+                                Address
+                            </label>
+                            <label>
+                                <input type="checkbox" name="required-fields" value="emergency-contact">
+                                Emergency Contact
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="secondary-button" data-action="save-draft">
+                            Save as Draft
+                        </button>
+                        <button type="submit" class="primary-button">
+                            Create Template
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div id="error-message" class="error-alert" style="display: none;"></div>
+    <div id="success-message" class="success-alert" style="display: none;"></div>
+
+    <!-- Scripts -->
+    <script type="module" src="auth-handler.js"></script>
+    <script type="module" src="waiver-management.js"></script>
+    <script type="module" src="waivers.js"></script>
+</body>
+</html>
+
