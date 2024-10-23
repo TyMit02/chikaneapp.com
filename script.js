@@ -297,11 +297,15 @@ async function loadEvents() {
 }
 
 // Load Event Details
-async function loadEventDetails(eventId) {
+async function loadEventDetails(user, eventId) {
     try {
+        if (!eventId) {
+            throw new Error('No event ID provided');
+        }
+
         const eventRef = doc(db, "events", eventId);
         const eventDoc = await getDoc(eventRef);
-        
+
         if (!eventDoc.exists()) {
             showError("Event not found");
             return;
@@ -309,48 +313,30 @@ async function loadEventDetails(eventId) {
 
         const event = eventDoc.data();
         
-        // Update UI elements
+        // Update basic event info
         updateElement("event-title", event.name || 'Untitled Event');
         updateElement("code-value", event.eventCode || 'N/A');
         updateElement("track-value", event.track || 'N/A');
-        updateElement("event-date", event.date ? formatDate(event.date.toDate()) : 'N/A');
-        
-        // Load participants list
-        const participantsList = document.getElementById("participants-list");
-        if (participantsList) {
-            participantsList.innerHTML = "";
-            
-            if (event.participants && event.participants.length > 0) {
-                event.participants.forEach(participant => {
-                    const participantEl = document.createElement('div');
-                    participantEl.className = 'participant-item';
-                    participantEl.innerHTML = `
-                        <span>${participant}</span>
-                        <button class="remove-participant" data-participant="${participant}">
-                            Remove
-                        </button>
-                    `;
-                    
-                    const removeButton = participantEl.querySelector('.remove-participant');
-                    if (removeButton) {
-                        removeButton.addEventListener('click', () => removeParticipant(eventId, participant));
-                    }
-                    
-                    participantsList.appendChild(participantEl);
-                });
-            } else {
-                participantsList.innerHTML = "<p>No participants yet</p>";
-            }
-        }
-        
+
+        // Convert Firestore timestamp to Date
+        const eventDate = event.date?.toDate ? event.date.toDate() : new Date(event.date);
+        updateElement("event-date", formatDate(eventDate));
+
+        // Load participants
+        await loadParticipants(eventId);
         // Load schedules
         await loadSchedules(eventId);
-        
+
+        // Initialize management functions
+        setupParticipantManagement(eventId);
+        setupScheduleManagement(eventId);
+
     } catch (error) {
         console.error("Error loading event details:", error);
         showError("Failed to load event details");
     }
 }
+
 
 // Participant Management
 function setupParticipantForm() {
@@ -406,32 +392,38 @@ function setupScheduleForm() {
     }
 }
 
-async function handleScheduleSubmit(event) {
-    event.preventDefault();
+async function handleScheduleSubmit(e, eventId) {
+    e.preventDefault();
     
-    const title = document.getElementById("schedule-title").value;
-    const date = document.getElementById("schedule-date").value;
-    
-    if (!title || !date) return;
-
     try {
+        const startTime = document.getElementById('schedule-start').value;
+        const endTime = document.getElementById('schedule-end').value;
+        const title = document.getElementById('schedule-title').value;
+        const description = document.getElementById('schedule-description').value;
+
+        if (!startTime || !endTime || !title) {
+            showError('Please fill in all required fields');
+            return;
+        }
+
         const scheduleData = {
             title,
-            date: new Date(date),
+            description,
+            startTime: Timestamp.fromDate(new Date(startTime)),
+            endTime: Timestamp.fromDate(new Date(endTime)),
             createdAt: serverTimestamp()
         };
-        
-        const eventRef = doc(db, "events", currentEventId);
-        const schedulesRef = collection(eventRef, "schedules");
-        await addDoc(schedulesRef, scheduleData);
-        
-        showSuccess("Schedule added successfully");
-        event.target.reset();
-        loadSchedules(currentEventId);
-        
+
+        const scheduleRef = collection(db, 'events', eventId, 'schedules');
+        await addDoc(scheduleRef, scheduleData);
+
+        showSuccess('Schedule added successfully');
+        e.target.reset();
+        await loadSchedules(eventId);
+
     } catch (error) {
-        console.error("Error adding schedule:", error);
-        showError("Failed to add schedule");
+        console.error('Error adding schedule:', error);
+        showError('Failed to add schedule');
     }
 }
 
@@ -492,6 +484,24 @@ async function deleteSchedule(eventId, scheduleId) {
     } catch (error) {
         console.error("Error deleting schedule:", error);
         showError("Failed to delete schedule");
+    }
+}
+
+async function handleDeleteSchedule(eventId, scheduleId) {
+    try {
+        if (!confirm('Are you sure you want to delete this schedule?')) {
+            return;
+        }
+
+        const scheduleRef = doc(db, 'events', eventId, 'schedules', scheduleId);
+        await deleteDoc(scheduleRef);
+
+        showSuccess('Schedule deleted successfully');
+        await loadSchedules(eventId);
+
+    } catch (error) {
+        console.error('Error deleting schedule:', error);
+        showError('Failed to delete schedule');
     }
 }
 
@@ -959,6 +969,16 @@ function formatDate(date) {
     });
 }
 
+function formatDateTime(date) {
+    return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    }).format(date);
+}
+
 function calculateAverageTicketPrice(transactions) {
     const registrations = transactions.filter(t => t.type === 'registration' && t.status === 'completed');
     if (registrations.length === 0) return 0;
@@ -1423,3 +1443,73 @@ function updateRevenueChart(data) {
     chartContainer.dispatchEvent(event);
 }
 
+
+function setupScheduleManagement(eventId) {
+    const scheduleForm = document.getElementById('schedule-form');
+    if (scheduleForm) {
+        scheduleForm.addEventListener('submit', (e) => handleScheduleSubmit(e, eventId));
+    }
+
+    // Setup delete schedule buttons
+    document.querySelectorAll('.delete-schedule-btn').forEach(btn => {
+        btn.addEventListener('click', () => handleDeleteSchedule(eventId, btn.dataset.scheduleId));
+    });
+}
+
+async function loadParticipants(eventId) {
+    try {
+        const participantsList = document.getElementById('participants-list');
+        if (!participantsList) return;
+
+        const eventRef = doc(db, 'events', eventId);
+        const eventDoc = await getDoc(eventRef);
+        const participants = eventDoc.data()?.participants || [];
+
+        if (participants.length === 0) {
+            participantsList.innerHTML = '<div class="empty-state">No participants yet</div>';
+            return;
+        }
+
+        participantsList.innerHTML = participants.map(participant => `
+            <div class="participant-item">
+                <span class="participant-name">${participant}</span>
+                <button class="delete-participant-btn" data-participant-id="${participant}">
+                    Remove
+                </button>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error('Error loading participants:', error);
+        showError('Failed to load participants');
+    }
+}
+
+function createScheduleElement(id, schedule) {
+    const div = document.createElement('div');
+    div.className = 'schedule-item';
+    
+    const startTime = schedule.startTime.toDate();
+    const endTime = schedule.endTime.toDate();
+
+    div.innerHTML = `
+        <div class="schedule-info">
+            <h4>${schedule.title}</h4>
+            <p>${formatDateTime(startTime)} - ${formatDateTime(endTime)}</p>
+            ${schedule.description ? `<p class="description">${schedule.description}</p>` : ''}
+        </div>
+        <button class="delete-schedule-btn" data-schedule-id="${id}">
+            Delete
+        </button>
+    `;
+
+    return div;
+}
+
+export {
+    loadEventDetails,
+    setupParticipantManagement,
+    setupScheduleManagement,
+    loadSchedules,
+    loadParticipants
+};
