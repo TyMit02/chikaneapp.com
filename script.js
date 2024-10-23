@@ -36,6 +36,12 @@ function displayCurrentUser() {
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Document loaded, starting initialization...');
 
+
+
+    if (currentPage === 'dashboard.html') {
+        initializeCharts();
+    }
+    
     try {
         // Initialize Firebase app and authentication handler
         initializeAuthHandler();
@@ -538,27 +544,55 @@ async function loadDashboard(user) {
 
 // Initialize charts (Ensure this is defined)
 function initializeCharts() {
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [{
-                label: 'Revenue',
-                data: [12, 19, 3, 5, 2, 3, 7],
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
-                fill: false
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+    const revenueChartCanvas = document.getElementById('revenueChart');
+    
+    // Only initialize if the element exists
+    if (revenueChartCanvas) {
+        const ctx = revenueChartCanvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [0, 0, 0, 0, 0, 0], // This will be replaced with real data
+                    borderColor: '#FF4500',
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#E6F0FF'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#2e3b4e'
+                        },
+                        ticks: {
+                            color: '#8899A6'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: '#2e3b4e'
+                        },
+                        ticks: {
+                            color: '#8899A6'
+                        }
+                    }
                 }
             }
-        }
-    });
+        });
+    }
 }
 
 // Dashboard Summary
