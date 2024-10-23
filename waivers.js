@@ -252,3 +252,181 @@ document.addEventListener('DOMContentLoaded', function() {
         // Implementation for viewing all contacts
     };
 });
+
+// Add to your waivers.js or create a new modal-handler.js
+class ModalHandler {
+    constructor() {
+        this.initialize();
+    }
+
+    initialize() {
+        // Modal elements
+        this.modal = document.getElementById('waiver-preview-modal');
+        this.closeButtons = document.querySelectorAll('.close-modal, .modal-close');
+        this.modalContent = document.querySelector('.modal-content');
+        
+        // Bind event listeners
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        // Close button click
+        this.closeButtons.forEach(button => {
+            button.addEventListener('click', () => this.closeModal());
+        });
+
+        // Click outside modal
+        window.addEventListener('click', (e) => {
+            if (e.target === this.modal) {
+                this.closeModal();
+            }
+        });
+
+        // Escape key press
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeModal();
+            }
+        });
+
+        // Modal action buttons
+        const actionButtons = document.querySelectorAll('.modal-actions button');
+        actionButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const action = e.target.dataset.action;
+                this.handleModalAction(action);
+            });
+        });
+    }
+
+    openModal(content) {
+        if (this.modal) {
+            // Update modal content
+            const contentContainer = document.getElementById('waiver-preview-content');
+            if (contentContainer) {
+                contentContainer.innerHTML = content;
+            }
+
+            // Show modal
+            this.modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+    }
+
+    closeModal() {
+        if (this.modal) {
+            this.modal.style.display = 'none';
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+    }
+
+    handleModalAction(action) {
+        switch (action) {
+            case 'edit':
+                // Handle edit action
+                this.closeModal();
+                // Implement edit functionality
+                break;
+            case 'assign':
+                // Handle assign action
+                this.closeModal();
+                // Implement assign functionality
+                break;
+            default:
+                this.closeModal();
+                break;
+        }
+    }
+}
+
+// Update your waiver preview function
+async function previewWaiver(eventId) {
+    const templateSelect = document.getElementById('waiver-template-select');
+    const selectedTemplate = templateSelect.value;
+
+    if (!selectedTemplate) return;
+
+    try {
+        // Get event details for template variables
+        const eventDoc = await getDoc(doc(db, 'events', eventId));
+        const eventData = eventDoc.data();
+
+        // Generate waiver preview
+        const waiver = generateWaiver(selectedTemplate, {
+            eventName: eventData.name,
+            organizerName: eventData.organizerName,
+            eventDate: eventData.date.toDate().toLocaleDateString(),
+        });
+
+        // Create modal content
+        const modalContent = `
+            <div class="waiver-preview">
+                <div class="waiver-content">
+                    ${waiver.content}
+                </div>
+                <div class="waiver-meta">
+                    <div class="meta-item">
+                        <span class="label">Template:</span>
+                        <span class="value">${waiver.name}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="label">Version:</span>
+                        <span class="value">${waiver.version}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Use modal handler to show preview
+        const modalHandler = new ModalHandler();
+        modalHandler.openModal(modalContent);
+
+    } catch (error) {
+        console.error('Error previewing waiver:', error);
+        showError('Failed to preview waiver');
+    }
+}
+
+// Add some CSS for the modal
+const style = document.createElement('style');
+style.textContent = `
+    .waiver-preview {
+        padding: 20px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .waiver-content {
+        white-space: pre-wrap;
+        font-family: 'Arial', sans-serif;
+        line-height: 1.6;
+        color: #E6F0FF;
+        margin-bottom: 20px;
+    }
+
+    .waiver-meta {
+        border-top: 1px solid #2e3b4e;
+        padding-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .meta-item .label {
+        color: #8899A6;
+        font-size: 0.875rem;
+    }
+
+    .meta-item .value {
+        color: #E6F0FF;
+        font-weight: 500;
+    }
+`;
+
+document.head.appendChild(style);
