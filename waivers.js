@@ -23,6 +23,9 @@ import {
     initializeApp 
 } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
 
+import { WaiverManagementSystem } from './waiver-management.js';
+
+
 // Your Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
