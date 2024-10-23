@@ -90,58 +90,246 @@
 
         <!-- Subscription Management -->
         <div id="subscription-view" class="view-container">
-            <h1>Subscription Management</h1>
+            <div id="subscription-view" class="view-container w-full max-w-7xl mx-auto px-4 py-8">
+                <!-- Current Plan Summary -->
+                <div class="mb-8 bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
+                    <h2 class="text-2xl font-bold text-[#E6F0FF] mb-4">Current Plan</h2>
+                    <div id="current-plan-details" class="flex items-center justify-between">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
             
-            <div class="current-plan">
-                <h2>Current Plan</h2>
-                <div id="current-plan-details" class="plan-details"></div>
+                <!-- Pricing Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Basic Plan -->
+                    <div class="relative bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
+                        <div class="text-center mb-6">
+                            <h3 class="text-xl font-bold text-[#E6F0FF] mb-2">Basic</h3>
+                            <div class="text-3xl font-bold text-[#E6F0FF]">
+                                $199
+                                <span class="text-[#8899A6] text-base font-normal">/month</span>
+                            </div>
+                        </div>
+            
+                        <ul class="space-y-4 mb-6">
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>2 events per month</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Up to 50 participants per event</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>48h support response</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Basic analytics</span>
+                            </li>
+                        </ul>
+            
+                        <button onclick="selectPlan('basic')" class="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-[#FF4500] hover:bg-[#FF6533] text-white">
+                            Select Plan
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+            
+                    <!-- Professional Plan -->
+                    <div class="relative bg-[#1A2838] rounded-lg p-6 border border-[#FF4500]">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                            <span class="bg-[#FF4500] text-white px-3 py-1 rounded-full text-sm">
+                                Most Popular
+                            </span>
+                        </div>
+            
+                        <div class="text-center mb-6">
+                            <h3 class="text-xl font-bold text-[#E6F0FF] mb-2">Professional</h3>
+                            <div class="text-3xl font-bold text-[#E6F0FF]">
+                                $399
+                                <span class="text-[#8899A6] text-base font-normal">/month</span>
+                            </div>
+                        </div>
+            
+                        <ul class="space-y-4 mb-6">
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>5 events per month</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Up to 150 participants per event</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>24h support response</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Advanced analytics</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Custom branding</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Export reports</span>
+                            </li>
+                        </ul>
+            
+                        <button onclick="selectPlan('professional')" class="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-[#FF4500] hover:bg-[#FF6533] text-white">
+                            Select Plan
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+            
+                    <!-- Enterprise Plan -->
+                    <div class="relative bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
+                        <div class="text-center mb-6">
+                            <h3 class="text-xl font-bold text-[#E6F0FF] mb-2">Enterprise</h3>
+                            <div class="text-3xl font-bold text-[#E6F0FF]">
+                                $999
+                                <span class="text-[#8899A6] text-base font-normal">/month</span>
+                            </div>
+                        </div>
+            
+                        <ul class="space-y-4 mb-6">
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Unlimited events</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Unlimited participants</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>4h support response</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Premium analytics</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>API access</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-[#E6F0FF]">
+                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Dedicated support</span>
+                            </li>
+                        </ul>
+            
+                        <button onclick="selectPlan('enterprise')" class="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-[#FF4500] hover:bg-[#FF6533] text-white">
+                            Select Plan
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            
+                <!-- Usage Stats -->
+                <div class="mt-8 bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
+                    <h2 class="text-xl font-bold text-[#E6F0FF] mb-4">Current Usage</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-[#0A1828] p-4 rounded-lg">
+                            <p class="text-[#8899A6] mb-1">Events This Month</p>
+                            <p class="text-2xl text-[#E6F0FF] font-bold" id="events-count">0 / 5</p>
+                        </div>
+                        <div class="bg-[#0A1828] p-4 rounded-lg">
+                            <p class="text-[#8899A6] mb-1">Total Participants</p>
+                            <p class="text-2xl text-[#E6F0FF] font-bold" id="participants-count">0</p>
+                        </div>
+                        <div class="bg-[#0A1828] p-4 rounded-lg">
+                            <p class="text-[#8899A6] mb-1">Next Billing Date</p>
+                            <p class="text-2xl text-[#E6F0FF] font-bold" id="next-billing-date">-</p>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Billing History -->
+                <div class="mt-8 bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
+                    <h2 class="text-xl font-bold text-[#E6F0FF] mb-4">Billing History</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-[#E6F0FF]">
+                            <thead>
+                                <tr class="text-left border-b border-[#2e3b4e]">
+                                    <th class="pb-4">Date</th>
+                                    <th class="pb-4">Amount</th>
+                                    <th class="pb-4">Status</th>
+                                    <th class="pb-4">Invoice</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-[#8899A6]" id="billing-history">
+                                <tr>
+                                    <td class="py-4" colspan="4">
+                                        No billing history available
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            
+                <!-- Cancel Subscription Modal -->
+                <div id="cancel-subscription-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-[#1A2838] p-6 rounded-lg max-w-md w-full mx-4">
+                        <h3 class="text-xl font-bold text-[#E6F0FF] mb-4">Cancel Subscription</h3>
+                        <p class="text-[#8899A6] mb-6">Are you sure you want to cancel your subscription? You'll lose access to premium features at the end of your billing period.</p>
+                        <div class="flex justify-end gap-4">
+                            <button onclick="closeModal('cancel-subscription-modal')" class="px-4 py-2 rounded-lg text-[#E6F0FF] bg-[#2e3b4e] hover:bg-[#3e4b5e]">
+                                Keep Subscription
+                            </button>
+                            <button onclick="confirmCancelSubscription()" class="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700">
+                                Cancel Subscription
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="pricing-tiers">
-                <div class="pricing-card" data-plan="basic">
-                    <h3>Basic</h3>
-                    <p class="price">$199<span>/month</span></p>
-                    <ul class="features">
-                        <li>2 events per month</li>
-                        <li>Up to 50 participants per event</li>
-                        <li>48h support response</li>
-                        <li>Basic analytics</li>
-                    </ul>
-                    <button onclick="selectPlan('basic')" class="select-plan-btn">Select Plan</button>
-                </div>
-
-                <div class="pricing-card popular" data-plan="pro">
-                    <div class="popular-badge">Most Popular</div>
-                    <h3>Professional</h3>
-                    <p class="price">$399<span>/month</span></p>
-                    <ul class="features">
-                        <li>5 events per month</li>
-                        <li>Up to 150 participants per event</li>
-                        <li>24h support response</li>
-                        <li>Advanced analytics</li>
-                        <li>Custom branding</li>
-                        <li>Export reports</li>
-                    </ul>
-                    <button onclick="selectPlan('pro')" class="select-plan-btn">Select Plan</button>
-                </div>
-
-                <div class="pricing-card" data-plan="enterprise">
-                    <h3>Enterprise</h3>
-                    <p class="price">$999<span>/month</span></p>
-                    <ul class="features">
-                        <li>Unlimited events</li>
-                        <li>Unlimited participants</li>
-                        <li>4h support response</li>
-                        <li>Premium analytics</li>
-                        <li>Custom branding</li>
-                        <li>API access</li>
-                        <li>Dedicated support</li>
-                    </ul>
-                    <button onclick="selectPlan('enterprise')" class="select-plan-btn">Select Plan</button>
-                </div>
-            </div>
-        </div>
-
+            
         <!-- Organizer Settings -->
         <div id="settings-view" class="view-container">
             <h1>Organizer Settings</h1>
