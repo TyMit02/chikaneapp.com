@@ -1,10 +1,67 @@
-import WaiverManagementSystem from './waiver-management.js';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { 
+    getFirestore, 
+    collection, 
+    doc, 
+    addDoc, 
+    updateDoc, 
+    deleteDoc, 
+    getDoc, 
+    getDocs,
+    query, 
+    where, 
+    orderBy,
+    serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+import { 
+    getAuth 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+
+import { 
+    initializeApp 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+
+import { 
+    getFirestore, 
+    collection, 
+    doc, 
+    addDoc, 
+    updateDoc, 
+    deleteDoc, 
+    getDoc, 
+    getDocs,
+    query, 
+    where, 
+    orderBy,
+    serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+import { 
+    getAuth 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+
+import { 
+    initializeApp 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+
+// Your Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
+    authDomain: "chikane-e5fa1.firebaseapp.com",
+    projectId: "chikane-e5fa1",
+    storageBucket: "chikane-e5fa1.appspot.com",
+    messagingSenderId: "989422231159",
+    appId: "1:989422231159:web:2895f389094dcccb9d3072",
+    measurementId: "G-GX4ZZW6EXK"
+};
+
+
+
 
 document.addEventListener('DOMContentLoaded', function() {
-    const db = getFirestore();
-    const auth = getAuth();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
     let waiverSystem;
 
     // Initialize waiver system when user is authenticated

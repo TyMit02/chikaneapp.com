@@ -167,6 +167,85 @@
             </div>
         </div>
 
+        <!-- Add this section to your event-details.html -->
+<div class="content-card">
+    <h2 class="card-header">
+        Waivers
+        <span class="count" id="waiver-status-count">0 Signed / 0 Required</span>
+    </h2>
+    
+    <div class="card-content">
+        <!-- Waiver Template Selection -->
+        <div class="waiver-setup-section" id="waiver-setup">
+            <div class="template-selection">
+                <h3>Event Waiver Setup</h3>
+                <select id="waiver-template-select" class="template-select">
+                    <option value="">Select a Waiver Template</option>
+                    <option value="standard">Standard Liability Waiver</option>
+                    <option value="minor">Minor Participant Waiver</option>
+                    <option value="media">Media Release Waiver</option>
+                    <option value="custom">Create Custom Waiver</option>
+                </select>
+                
+                <button id="preview-waiver-btn" class="secondary-button">
+                    Preview
+                </button>
+                
+                <button id="assign-waiver-btn" class="primary-button">
+                    Assign to Event
+                </button>
+            </div>
+        </div>
+
+        <!-- Waiver Status Section -->
+        <div class="waiver-status-section">
+            <div class="status-header">
+                <h3>Waiver Status</h3>
+                <button id="send-reminders-btn" class="secondary-button">
+                    Send Reminders
+                </button>
+            </div>
+            
+            <div class="waiver-status-grid">
+                <div class="status-card">
+                    <span class="status-label">Signed</span>
+                    <span class="status-value" id="signed-count">0</span>
+                </div>
+                <div class="status-card">
+                    <span class="status-label">Pending</span>
+                    <span class="status-value" id="pending-count">0</span>
+                </div>
+                <div class="status-card">
+                    <span class="status-label">Minor Waivers</span>
+                    <span class="status-value" id="minor-count">0</span>
+                </div>
+            </div>
+
+            <!-- Participant Waiver List -->
+            <div class="waiver-list" id="participant-waiver-list">
+                <!-- Will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Waiver Preview Modal -->
+<div id="waiver-preview-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Waiver Preview</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="waiver-preview-content"></div>
+            <div class="modal-actions">
+                <button class="secondary-button" data-action="edit">Edit</button>
+                <button class="primary-button" data-action="assign">Assign to Event</button>
+            </div>
+        </div>
+    </div>
+</div>
+
         <!-- Details Section -->
         <div class="content-card">
             <h2>Details</h2>

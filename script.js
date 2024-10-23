@@ -1513,3 +1513,140 @@ export {
     loadSchedules,
     loadParticipants
 };
+
+async function initializeWaiverSection(eventId) {
+    const waiverSystem = new WaiverManagementSystem(db, currentUser.uid);
+    
+    // Setup event listeners
+    document.getElementById('waiver-template-select').addEventListener('change', handleTemplateSelection);
+    document.getElementById('preview-waiver-btn').addEventListener('click', () => previewWaiver(eventId));
+    document.getElementById('assign-waiver-btn').addEventListener('click', () => assignWaiver(eventId));
+    document.getElementById('send-reminders-btn').addEventListener('click', () => sendWaiverReminders(eventId));
+
+    // Load initial waiver status
+    await loadWaiverStatus(eventId);
+}
+
+async function handleTemplateSelection(e) {
+    const selectedTemplate = e.target.value;
+    const previewBtn = document.getElementById('preview-waiver-btn');
+    const assignBtn = document.getElementById('assign-waiver-btn');
+
+    if (selectedTemplate === 'custom') {
+        // Redirect to waiver creation page or open modal
+        window.location.href = `waiver-editor.html?eventId=${eventId}`;
+    } else {
+        previewBtn.disabled = !selectedTemplate;
+        assignBtn.disabled = !selectedTemplate;
+    }
+}
+
+async function previewWaiver(eventId) {
+    const templateSelect = document.getElementById('waiver-template-select');
+    const selectedTemplate = templateSelect.value;
+
+    if (!selectedTemplate) return;
+
+    try {
+        // Get event details for template variables
+        const eventDoc = await getDoc(doc(db, 'events', eventId));
+        const eventData = eventDoc.data();
+
+        // Generate waiver preview
+        const waiver = generateWaiver(selectedTemplate, {
+            eventName: eventData.name,
+            organizerName: eventData.organizerName,
+            eventDate: eventData.date.toDate().toLocaleDateString(),
+            // Add other event-specific data
+        });
+
+        // Show preview modal
+        const modal = document.getElementById('waiver-preview-modal');
+        const content = document.getElementById('waiver-preview-content');
+        content.innerHTML = `<div class="waiver-content">${waiver.content}</div>`;
+        modal.style.display = 'flex';
+
+    } catch (error) {
+        console.error('Error previewing waiver:', error);
+        showError('Failed to preview waiver');
+    }
+}
+
+async function assignWaiver(eventId) {
+    const templateSelect = document.getElementById('waiver-template-select');
+    const selectedTemplate = templateSelect.value;
+
+    if (!selectedTemplate) return;
+
+    try {
+        await waiverSystem.assignToEvent(eventId, selectedTemplate, {
+            requiresRenewal: false,
+            validityPeriod: 24, // hours
+            minimumAge: 18
+        });
+
+        showSuccess('Waiver assigned successfully');
+        await loadWaiverStatus(eventId);
+
+        // Optional: Send notifications to participants
+        await sendWaiverNotifications(eventId);
+
+    } catch (error) {
+        console.error('Error assigning waiver:', error);
+        showError('Failed to assign waiver');
+    }
+}
+
+async function loadWaiverStatus(eventId) {
+    try {
+        const waiverStatus = await waiverSystem.getEventWaiverStatus(eventId);
+        
+        // Update status counts
+        document.getElementById('signed-count').textContent = waiverStatus.signedCount;
+        document.getElementById('pending-count').textContent = waiverStatus.pendingCount;
+        document.getElementById('minor-count').textContent = waiverStatus.minorCount;
+
+        // Update participant list
+        const listContainer = document.getElementById('participant-waiver-list');
+        listContainer.innerHTML = waiverStatus.participants.map(participant => `
+            <div class="waiver-list-item">
+                <div class="participant-info">
+                    <span class="participant-name">${participant.name}</span>
+                    <span class="waiver-status status-${participant.waiverStatus}">
+                        ${formatWaiverStatus(participant.waiverStatus)}
+                    </span>
+                </div>
+                <div class="actions">
+                    ${getWaiverActionButton(participant)}
+                </div>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error('Error loading waiver status:', error);
+        showError('Failed to load waiver status');
+    }
+}
+
+function formatWaiverStatus(status) {
+    const statusMap = {
+        signed: 'Signed',
+        pending: 'Pending',
+        expired: 'Expired',
+        minor_pending: 'Minor Waiver Pending'
+    };
+    return statusMap[status] || status;
+}
+
+function getWaiverActionButton(participant) {
+    switch (participant.waiverStatus) {
+        case 'signed':
+            return `<button class="secondary-button" onclick="viewSignedWaiver('${participant.id}')">View</button>`;
+        case 'pending':
+            return `<button class="primary-button" onclick="sendWaiverReminder('${participant.id}')">Send Reminder</button>`;
+        case 'expired':
+            return `<button class="primary-button" onclick="requestNewWaiver('${participant.id}')">Request New</button>`;
+        default:
+            return '';
+    }
+}

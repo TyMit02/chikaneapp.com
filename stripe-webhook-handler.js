@@ -1,14 +1,40 @@
-// stripe-webhook-handler.js
-import { initializeApp } from "firebase/app";
 import { 
     getFirestore, 
     collection, 
     doc, 
-    setDoc, 
+    addDoc, 
     updateDoc, 
-    getDoc,
+    deleteDoc, 
+    getDoc, 
+    getDocs,
+    query, 
+    where, 
+    orderBy,
     serverTimestamp 
-} from "firebase/firestore";
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+import { 
+    getAuth 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+
+import { 
+    initializeApp 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+
+// Your Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyC3g85grffiBMjSWQ-1XMljIlEU6_bt_w8",
+    authDomain: "chikane-e5fa1.firebaseapp.com",
+    projectId: "chikane-e5fa1",
+    storageBucket: "chikane-e5fa1.appspot.com",
+    messagingSenderId: "989422231159",
+    appId: "1:989422231159:web:2895f389094dcccb9d3072",
+    measurementId: "G-GX4ZZW6EXK"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
