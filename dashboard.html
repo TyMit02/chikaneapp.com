@@ -89,186 +89,182 @@
         </div>
 
         <!-- Subscription Management -->
-        <div id="subscription-view" class="view-container">
-            <div id="subscription-view" class="view-container w-full max-w-7xl mx-auto px-4 py-8">
-                <!-- Current Plan Summary -->
-                <div class="mb-8 bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
-                    <h2 class="text-2xl font-bold text-[#E6F0FF] mb-4">Current Plan</h2>
-                    <div id="current-plan-details" class="flex items-center justify-between">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
+        <div id="subscription-view" class="view-container w-full max-w-7xl mx-auto px-4 py-8">
+            <!-- Current Plan Summary -->
+            <div class="mb-8 bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
+                <h2 class="text-2xl font-bold text-[#E6F0FF] mb-4">Current Plan</h2>
+                <div id="current-plan-details" class="flex items-center justify-between">
+                    <!-- Will be populated by JavaScript -->
                 </div>
-            
-                <!-- Pricing Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Basic Plan -->
-                    <div class="relative bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
-                        <div class="text-center mb-6">
-                            <h3 class="text-xl font-bold text-[#E6F0FF] mb-2">Basic</h3>
-                            <div class="text-3xl font-bold text-[#E6F0FF]">
-                                $199
-                                <span class="text-[#8899A6] text-base font-normal">/month</span>
-                            </div>
+            </div>
+        
+            <!-- Pricing Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Basic Plan -->
+                <div class="relative bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-[#E6F0FF] mb-2">Basic</h3>
+                        <div class="text-3xl font-bold text-[#E6F0FF]">
+                            $199
+                            <span class="text-[#8899A6] text-base font-normal">/month</span>
                         </div>
-            
-                        <ul class="space-y-4 mb-6">
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>2 events per month</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>Up to 50 participants per event</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>48h support response</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>Basic analytics</span>
-                            </li>
-                        </ul>
-            
-                        <button onclick="selectPlan('basic')" class="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-[#FF4500] hover:bg-[#FF6533] text-white">
-                            Select Plan
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
-                            </svg>
-                        </button>
                     </div>
-            
-                    <!-- Professional Plan -->
-                    <div class="relative bg-[#1A2838] rounded-lg p-6 border border-[#FF4500]">
-                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                            <span class="bg-[#FF4500] text-white px-3 py-1 rounded-full text-sm">
-                                Most Popular
-                            </span>
-                        </div>
-            
-                        <div class="text-center mb-6">
-                            <h3 class="text-xl font-bold text-[#E6F0FF] mb-2">Professional</h3>
-                            <div class="text-3xl font-bold text-[#E6F0FF]">
-                                $399
-                                <span class="text-[#8899A6] text-base font-normal">/month</span>
-                            </div>
-                        </div>
-            
-                        <ul class="space-y-4 mb-6">
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>5 events per month</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>Up to 150 participants per event</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>24h support response</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>Advanced analytics</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>Custom branding</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>Export reports</span>
-                            </li>
-                        </ul>
-            
-                        <button onclick="selectPlan('professional')" class="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-[#FF4500] hover:bg-[#FF6533] text-white">
-                            Select Plan
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
+        
+                    <ul class="space-y-4 mb-6">
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                        </button>
-                    </div>
-            
-                    <!-- Enterprise Plan -->
-                    <div class="relative bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
-                        <div class="text-center mb-6">
-                            <h3 class="text-xl font-bold text-[#E6F0FF] mb-2">Enterprise</h3>
-                            <div class="text-3xl font-bold text-[#E6F0FF]">
-                                $999
-                                <span class="text-[#8899A6] text-base font-normal">/month</span>
-                            </div>
-                        </div>
-            
-                        <ul class="space-y-4 mb-6">
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>Unlimited events</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>Unlimited participants</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>4h support response</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>Premium analytics</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>API access</span>
-                            </li>
-                            <li class="flex items-center gap-2 text-[#E6F0FF]">
-                                <svg class="h-5 w-5 text-[#FF4500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <span>Dedicated support</span>
-                            </li>
-                        </ul>
-            
-                        <button onclick="selectPlan('enterprise')" class="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-[#FF4500] hover:bg-[#FF6533] text-white">
-                            Select Plan
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
+                            <span>2 events per month</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                        </button>
-                    </div>
+                            <span>Up to 50 participants per event</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>48h support response</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Basic analytics</span>
+                        </li>
+                    </ul>
+        
+                    <button onclick="selectPlan('basic')" class="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-[#FF4500] hover:bg-[#FF6533] text-white">
+                        Select Plan
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
                 </div>
+        
+                <!-- Professional Plan -->
+                <div class="relative bg-[#1A2838] rounded-lg p-6 border border-[#FF4500]">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-[#FF4500] text-white px-3 py-1 rounded-full text-sm">
+                            Most Popular
+                        </span>
+                    </div>
+        
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-[#E6F0FF] mb-2">Professional</h3>
+                        <div class="text-3xl font-bold text-[#E6F0FF]">
+                            $399
+                            <span class="text-[#8899A6] text-base font-normal">/month</span>
+                        </div>
+                    </div>
+        
+                    <ul class="space-y-4 mb-6">
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>5 events per month</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Up to 150 participants per event</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>24h support response</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Advanced analytics</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Custom branding</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Export reports</span>
+                        </li>
+                    </ul>
+        
+                    <button onclick="selectPlan('professional')" class="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-[#FF4500] hover:bg-[#FF6533] text-white">
+                        Select Plan
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+        
+                <!-- Enterprise Plan -->
+                <div class="relative bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-[#E6F0FF] mb-2">Enterprise</h3>
+                        <div class="text-3xl font-bold text-[#E6F0FF]">
+                            $999
+                            <span class="text-[#8899A6] text-base font-normal">/month</span>
+                        </div>
+                    </div>
+        
+                    <ul class="space-y-4 mb-6">
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Unlimited events</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Unlimited participants</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>4h support response</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Premium analytics</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>API access</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-[#E6F0FF]">
+                            <svg class="w-4 h-4 text-[#FF4500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Dedicated support</span>
+                        </li>
+                    </ul>
+        
+                    <button onclick="selectPlan('enterprise')" class="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-[#FF4500] hover:bg-[#FF6533] text-white">
+                        Select Plan
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
             
                 <!-- Usage Stats -->
                 <div class="mt-8 bg-[#1A2838] rounded-lg p-6 border border-[#2e3b4e]">
@@ -329,7 +325,7 @@
                     </div>
                 </div>
             </div>
-            
+
         <!-- Organizer Settings -->
         <div id="settings-view" class="view-container">
             <h1>Organizer Settings</h1>
