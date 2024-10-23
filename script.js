@@ -33,11 +33,15 @@ function displayCurrentUser() {
 }
 
 // DOM Content Loaded Event Listener
+// DOM Content Loaded Event Listener
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Document loaded, starting initialization...');
 
+    // Get the current page name first
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    console.log('Current page:', currentPage);
 
-
+    // Initialize charts if we're on the dashboard
     if (currentPage === 'dashboard.html') {
         initializeCharts();
     }
@@ -46,8 +50,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Initialize Firebase app and authentication handler
         initializeAuthHandler();
 
-        // Get the current page name
-        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
         const protectedPages = ['dashboard.html', 'event-details.html', 'create-event.html'];
 
         // If the current page requires authentication, ensure the user is logged in
