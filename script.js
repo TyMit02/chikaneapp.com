@@ -78,7 +78,9 @@ function initializePageFunctionality(currentPage, user) {
             loadDashboard(user);
             setupEventManagement(user);
             setupFinancialMetrics(user); // New function for collapsible financial metrics
+            initializeRevenueSection();
             break;
+
 
         case 'event-details.html':
             const eventId = new URLSearchParams(window.location.search).get('eventId');
@@ -297,7 +299,9 @@ async function loadEvents() {
 // Load Event Details
 async function loadEventDetails(eventId) {
     try {
-        const eventDoc = await getDoc(doc(db, "events", eventId));
+        const eventRef = doc(db, "events", eventId);
+        const eventDoc = await getDoc(eventRef);
+        
         if (!eventDoc.exists()) {
             showError("Event not found");
             return;
@@ -306,9 +310,10 @@ async function loadEventDetails(eventId) {
         const event = eventDoc.data();
         
         // Update UI elements
-        updateElement("event-title", event.name);
-        updateElement("code-value", event.eventCode);
-        updateElement("track-value", event.track);
+        updateElement("event-title", event.name || 'Untitled Event');
+        updateElement("code-value", event.eventCode || 'N/A');
+        updateElement("track-value", event.track || 'N/A');
+        updateElement("event-date", event.date ? formatDate(event.date.toDate()) : 'N/A');
         
         // Load participants list
         const participantsList = document.getElementById("participants-list");
@@ -317,18 +322,19 @@ async function loadEventDetails(eventId) {
             
             if (event.participants && event.participants.length > 0) {
                 event.participants.forEach(participant => {
-                    const participantEl = createElement('div', {
-                        className: 'participant-item',
-                        innerHTML: `
-                            <span>${participant}</span>
-                            <button class="remove-participant" data-participant="${participant}">
-                                Remove
-                            </button>
-                        `
-                    });
+                    const participantEl = document.createElement('div');
+                    participantEl.className = 'participant-item';
+                    participantEl.innerHTML = `
+                        <span>${participant}</span>
+                        <button class="remove-participant" data-participant="${participant}">
+                            Remove
+                        </button>
+                    `;
                     
                     const removeButton = participantEl.querySelector('.remove-participant');
-                    removeButton.addEventListener('click', () => removeParticipant(eventId, participant));
+                    if (removeButton) {
+                        removeButton.addEventListener('click', () => removeParticipant(eventId, participant));
+                    }
                     
                     participantsList.appendChild(participantEl);
                 });
@@ -338,7 +344,7 @@ async function loadEventDetails(eventId) {
         }
         
         // Load schedules
-        loadSchedules(eventId);
+        await loadSchedules(eventId);
         
     } catch (error) {
         console.error("Error loading event details:", error);
@@ -944,13 +950,12 @@ function formatCurrency(amount) {
     }).format(amount / 100); // Assuming amounts are stored in cents
 }
 
-function formatDate(timestamp) {
-    return new Date(timestamp).toLocaleDateString('en-US', {
+function formatDate(date) {
+    return new Date(date).toLocaleDateString('en-US', {
+        weekday: 'long',
         year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        month: 'long',
+        day: 'numeric'
     });
 }
 
@@ -1238,3 +1243,183 @@ function setupEventCreation(user) {
         }
     });
 }
+
+function setupParticipantManagement(user, eventId) {
+    // Setup add participant form
+    const addParticipantForm = document.getElementById('add-participant-form');
+    if (addParticipantForm) {
+        addParticipantForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const participantInput = document.getElementById('participant-name');
+            if (!participantInput || !participantInput.value.trim()) return;
+
+            try {
+                const eventRef = doc(db, "events", eventId);
+                await updateDoc(eventRef, {
+                    participants: arrayUnion(participantInput.value.trim())
+                });
+
+                // Refresh the participants list
+                await loadEventDetails(eventId);
+                participantInput.value = '';
+                showSuccess('Participant added successfully');
+            } catch (error) {
+                console.error('Error adding participant:', error);
+                showError('Failed to add participant');
+            }
+        });
+    }
+
+    // Setup participant removal
+    async function removeParticipant(eventId, participantName) {
+        try {
+            const eventRef = doc(db, "events", eventId);
+            await updateDoc(eventRef, {
+                participants: arrayRemove(participantName)
+            });
+
+            await loadEventDetails(eventId);
+            showSuccess('Participant removed successfully');
+        } catch (error) {
+            console.error('Error removing participant:', error);
+            showError('Failed to remove participant');
+        }
+    }
+
+    // Expose removeParticipant function globally
+    window.removeParticipant = removeParticipant;
+
+    // Setup participant filtering
+    const searchInput = document.getElementById('participant-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const participants = document.querySelectorAll('.participant-item');
+            
+            participants.forEach(participant => {
+                const name = participant.querySelector('span').textContent.toLowerCase();
+                if (name.includes(searchTerm)) {
+                    participant.style.display = '';
+                } else {
+                    participant.style.display = 'none';
+                }
+            });
+        });
+    }
+}
+
+// Function to fetch revenue data
+async function fetchRevenueData(timeframe = '6months') {
+    try {
+        const user = auth.currentUser;
+        if (!user) return [];
+
+        const today = new Date();
+        let startDate = new Date();
+        
+        // Set the date range based on timeframe
+        switch(timeframe) {
+            case '30days':
+                startDate.setDate(today.getDate() - 30);
+                break;
+            case '6months':
+                startDate.setMonth(today.getMonth() - 6);
+                break;
+            case '1year':
+                startDate.setFullYear(today.getFullYear() - 1);
+                break;
+            default:
+                startDate.setMonth(today.getMonth() - 6);
+        }
+
+        // Query Firestore for transactions
+        const transactionsRef = collection(db, 'events');
+        const q = query(
+            transactionsRef,
+            where('organizerId', '==', user.uid),
+            where('date', '>=', startDate),
+            where('date', '<=', today),
+            orderBy('date', 'asc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        
+        // Process the data into monthly revenue
+        const revenueByMonth = {};
+        
+        querySnapshot.forEach((doc) => {
+            const event = doc.data();
+            const date = event.date.toDate();
+            const month = date.toLocaleString('default', { month: 'short' });
+            
+            // Calculate total revenue for this event
+            const revenue = calculateEventRevenue(event);
+            
+            if (revenueByMonth[month]) {
+                revenueByMonth[month] += revenue;
+            } else {
+                revenueByMonth[month] = revenue;
+            }
+        });
+
+        // Convert to array format for the chart
+        return Object.entries(revenueByMonth).map(([month, revenue]) => ({
+            month,
+            revenue: Number(revenue.toFixed(2))
+        }));
+
+    } catch (error) {
+        console.error('Error fetching revenue data:', error);
+        showError('Failed to load revenue data');
+        return [];
+    }
+}
+
+// Helper function to calculate event revenue
+function calculateEventRevenue(event) {
+    let total = 0;
+    
+    // Add registration fees
+    if (event.participants) {
+        total += event.participants.length * (event.registrationFee || 0);
+    }
+    
+    // Add garage revenue
+    if (event.garageBookings) {
+        total += event.garageBookings.length * (event.garageFee || 0);
+    }
+    
+    // Add any additional revenue sources
+    if (event.additionalRevenue) {
+        total += event.additionalRevenue;
+    }
+    
+    return total;
+}
+
+// Initialize the revenue section
+async function initializeRevenueSection() {
+    const timeframeSelect = document.querySelector('[data-revenue-timeframe]');
+    if (timeframeSelect) {
+        // Add event listener for timeframe changes
+        timeframeSelect.addEventListener('change', async (e) => {
+            const data = await fetchRevenueData(e.target.value);
+            updateRevenueChart(data);
+        });
+    }
+
+    // Initial load
+    const initialData = await fetchRevenueData('6months');
+    updateRevenueChart(initialData);
+}
+
+// Function to update the revenue chart with new data
+function updateRevenueChart(data) {
+    const chartContainer = document.getElementById('revenue-chart-root');
+    if (!chartContainer) return;
+
+    // The chart will be automatically updated through React
+    const event = new CustomEvent('updateRevenueData', { detail: data });
+    chartContainer.dispatchEvent(event);
+}
+
