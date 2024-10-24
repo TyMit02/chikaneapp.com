@@ -80,77 +80,78 @@
         </div>
 
         <!-- Run Group Management Section -->
-        <div id="run-groups-view" class="run-groups-container">
-            <!-- Header -->
-            <div class="section-header">
-                <h2>Run Group Management</h2>
-                <div class="action-buttons">
-                    <button onclick="createNewGroup()" class="action-button">Create Group</button>
-                    <button onclick="autoBalanceGroups()" class="action-button">Auto Balance</button>
-                </div>
+<div class="content-card">
+    <h2>Run Group Management</h2>
+    <div class="card-content">
+        <div class="card-header">
+            <div class="action-buttons">
+                <button onclick="createNewGroup()" class="action-button">Create Group</button>
+                <button onclick="autoBalanceGroups()" class="action-button">Auto Balance</button>
             </div>
+        </div>
 
-            <!-- Groups Grid -->
-            <div class="grid-container" id="run-groups-grid">
-                <!-- Individual Run Groups will be dynamically added here -->
-            </div>
+        <!-- Groups Grid -->
+        <div class="grid-container" id="run-groups-grid">
+            <!-- Individual Run Groups will be dynamically added here -->
+            <p class="empty-state">No run groups created yet</p>
+        </div>
 
-            <!-- Create/Edit Group Modal -->
-            <div id="group-modal" class="modal hidden">
-                <div class="modal-content">
-                    <h2 id="modal-title">Create Run Group</h2>
-                    
-                    <!-- Group Modal Form -->
-                    <div class="modal-form">
-                        <div class="form-group">
-                            <label for="group-name">Group Name</label>
-                            <input type="text" id="group-name" placeholder="e.g., Advanced, Intermediate, Novice">
+        <!-- Create/Edit Group Modal -->
+        <div id="group-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 id="modal-title">Create Run Group</h2>
+                
+                <!-- Group Modal Form -->
+                <div class="modal-form">
+                    <div class="form-group">
+                        <label for="group-name">Group Name</label>
+                        <input type="text" id="group-name" placeholder="e.g., Advanced, Intermediate, Novice">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="group-color">Color Code</label>
+                        <select id="group-color">
+                            <option value="red">Red</option>
+                            <option value="yellow">Yellow</option>
+                            <option value="green">Green</option>
+                            <option value="blue">Blue</option>
+                            <option value="purple">Purple</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="group-experience">Experience Level Required</label>
+                        <select id="group-experience">
+                            <option value="novice">Novice (0-2 track days)</option>
+                            <option value="intermediate">Intermediate (3-10 track days)</option>
+                            <option value="advanced">Advanced (11+ track days)</option>
+                            <option value="expert">Expert (Competition License)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="group-max">Maximum Participants</label>
+                        <input type="number" id="group-max" placeholder="25">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Requirements</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="require-instructor"> Instructor Required</label>
+                            <label><input type="checkbox" id="require-safety"> Safety Equipment Check</label>
+                            <label><input type="checkbox" id="require-timing"> Timing Required</label>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="group-color">Color Code</label>
-                            <select id="group-color">
-                                <option value="red">Red</option>
-                                <option value="yellow">Yellow</option>
-                                <option value="green">Green</option>
-                                <option value="blue">Blue</option>
-                                <option value="purple">Purple</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="group-experience">Experience Level Required</label>
-                            <select id="group-experience">
-                                <option value="novice">Novice (0-2 track days)</option>
-                                <option value="intermediate">Intermediate (3-10 track days)</option>
-                                <option value="advanced">Advanced (11+ track days)</option>
-                                <option value="expert">Expert (Competition License)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="group-max">Maximum Participants</label>
-                            <input type="number" id="group-max" placeholder="25">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Requirements</label>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" id="require-instructor"> Instructor Required</label>
-                                <label><input type="checkbox" id="require-safety"> Safety Equipment Check</label>
-                                <label><input type="checkbox" id="require-timing"> Timing Required</label>
-                            </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <button onclick="closeModal()" class="cancel-button">Cancel</button>
-                            <button onclick="saveGroup()" class="save-button">Save Group</button>
-                        </div>
+                    <div class="form-actions">
+                        <button onclick="closeModal()" class="cancel-button">Cancel</button>
+                        <button onclick="saveGroup()" class="save-button">Save Group</button>
                     </div>
                 </div>
             </div>
         </div>
-
+    </div>
+</div>
         <!-- Participants Section -->
         <div class="content-card">
             <h2>Participants <span class="count">0 Participants</span></h2>
