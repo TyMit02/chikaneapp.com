@@ -36,7 +36,7 @@ function displayCurrentUser() {
 // DOM Content Loaded Event Listener
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Document loaded, starting initialization...');
-    handleTemplateSelection();
+   
     // Get the current page name first
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     console.log('Current page:', currentPage);
@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error('Error during initialization:', error);
         showError('Failed to initialize the application.');
     }
+
 });
 
 // Initialize page functionality based on the current page
@@ -96,6 +97,7 @@ function initializePageFunctionality(currentPage, user) {
                 loadEventDetails(user, eventId);
                 setupParticipantManagement(user, eventId);
                 setupScheduleManagement(user, eventId);
+                handleTemplateSelection();
             }
             break;
 
@@ -1568,6 +1570,12 @@ function handleTemplateSelection() {
     const previewSection = document.getElementById('waiver-preview-section');
     const previewContent = document.getElementById('preview-content');
     const assignButton = document.getElementById('assign-waiver-btn');
+
+    // Only proceed if we have all necessary elements
+    if (!templateSelect || !previewSection || !previewContent || !assignButton) {
+        console.log('Waiver elements not found, skipping initialization');
+        return;
+    }
 
     templateSelect.addEventListener('change', async (e) => {
         const selectedTemplate = e.target.value;

@@ -2777,3 +2777,6 @@ input, textarea {
         flex-direction: column;
     }
 }
+.modal.hidden {
+    display: none !important;
+}
