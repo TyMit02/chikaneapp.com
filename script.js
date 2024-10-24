@@ -36,7 +36,7 @@ function displayCurrentUser() {
 // DOM Content Loaded Event Listener
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Document loaded, starting initialization...');
-
+    handleTemplateSelection();
     // Get the current page name first
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     console.log('Current page:', currentPage);
@@ -1563,18 +1563,58 @@ async function initializeWaiverSection(eventId) {
     await loadWaiverStatus(eventId);
 }
 
-async function handleTemplateSelection(e) {
-    const selectedTemplate = e.target.value;
-    const previewBtn = document.getElementById('preview-waiver-btn');
-    const assignBtn = document.getElementById('assign-waiver-btn');
+function handleTemplateSelection() {
+    const templateSelect = document.getElementById('waiver-template-select');
+    const previewSection = document.getElementById('waiver-preview-section');
+    const previewContent = document.getElementById('preview-content');
+    const assignButton = document.getElementById('assign-waiver-btn');
 
-    if (selectedTemplate === 'custom') {
-        // Redirect to waiver creation page or open modal
-        window.location.href = `waiver-editor.html?eventId=${eventId}`;
-    } else {
-        previewBtn.disabled = !selectedTemplate;
-        assignBtn.disabled = !selectedTemplate;
-    }
+    templateSelect.addEventListener('change', async (e) => {
+        const selectedTemplate = e.target.value;
+        
+        if (!selectedTemplate) {
+            previewSection.classList.add('hidden');
+            return;
+        }
+
+        try {
+            // Get event details for template variables
+            const eventId = new URLSearchParams(window.location.search).get('eventId');
+            const eventDoc = await getDoc(doc(db, 'events', eventId));
+            const eventData = eventDoc.data();
+
+            // Generate waiver preview
+            const waiver = generateWaiver(selectedTemplate, {
+                eventName: eventData.name,
+                organizerName: eventData.organizerName,
+                eventDate: eventData.date.toDate().toLocaleDateString()
+            });
+
+            // Show preview
+            previewSection.classList.remove('hidden');
+            previewContent.innerHTML = waiver.content;
+            
+        } catch (error) {
+            console.error('Error generating preview:', error);
+            showError('Failed to generate waiver preview');
+        }
+    });
+
+    // Handle assign button click
+    assignButton.addEventListener('click', async () => {
+        const selectedTemplate = templateSelect.value;
+        if (!selectedTemplate) return;
+
+        try {
+            const eventId = new URLSearchParams(window.location.search).get('eventId');
+            await assignWaiverToEvent(eventId, selectedTemplate);
+            showSuccess('Waiver assigned successfully');
+            await loadWaiverStatus(eventId);
+        } catch (error) {
+            console.error('Error assigning waiver:', error);
+            showError('Failed to assign waiver');
+        }
+    });
 }
 
 async function previewWaiver(eventId) {

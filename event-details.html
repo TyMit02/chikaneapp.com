@@ -167,7 +167,7 @@
             </div>
         </div>
 
-        <!-- Add this section to your event-details.html -->
+       <!-- Waivers Section -->
 <div class="content-card">
     <h2 class="card-header">
         Waivers
@@ -175,7 +175,7 @@
     </h2>
     
     <div class="card-content">
-        <!-- Waiver Template Selection -->
+        <!-- Waiver Setup Section -->
         <div class="waiver-setup-section" id="waiver-setup">
             <div class="template-selection">
                 <h3>Event Waiver Setup</h3>
@@ -187,13 +187,16 @@
                     <option value="custom">Create Custom Waiver</option>
                 </select>
                 
-                <button id="preview-waiver-btn" class="secondary-button">
-                    Preview
-                </button>
-                
-                <button id="assign-waiver-btn" class="primary-button">
-                    Assign to Event
-                </button>
+                <div class="waiver-preview-section hidden" id="waiver-preview-section">
+                    <div class="bg-slate-800 p-4 rounded-lg mt-4">
+                        <h4 class="text-white mb-2">Preview</h4>
+                        <div id="preview-content" class="bg-slate-700 p-4 rounded-lg"></div>
+                    </div>
+                    
+                    <button id="assign-waiver-btn" class="primary-button mt-4">
+                        Assign to Event
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -221,30 +224,8 @@
                 </div>
             </div>
 
-            <!-- Participant Waiver List -->
             <div class="waiver-list" id="participant-waiver-list">
-                <!-- Will be populated dynamically -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Waiver Preview Modal -->
-<div id="waiver-preview-modal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Waiver Preview</h2>
-            <button class="close-modal">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div id="waiver-preview-content"></div>
-            <div class="modal-actions">
-                <button class="secondary-button" data-action="edit">
-                    Edit Template
-                </button>
-                <button class="primary-button" data-action="assign">
-                    Assign to Event
-                </button>
+                <!-- Populated dynamically -->
             </div>
         </div>
     </div>

@@ -2605,3 +2605,175 @@ input, textarea {
 .status-expired {
     color: #F44336;
 }
+
+/* Waiver Section Styles */
+.waiver-setup-section {
+    background: #1A2838;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.template-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.template-selection h3 {
+    color: #E6F0FF;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.template-select {
+    width: 100%;
+    padding: 0.75rem;
+    background: #0A1828;
+    border: 1px solid #2e3b4e;
+    border-radius: 5px;
+    color: #E6F0FF;
+    font-size: 1rem;
+}
+
+.waiver-preview-section {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #0A1828;
+    border-radius: 8px;
+}
+
+.waiver-preview-section.hidden {
+    display: none;
+}
+
+.waiver-status-section {
+    background: #1A2838;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.waiver-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.status-card {
+    background: #0A1828;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.status-label {
+    display: block;
+    color: #8899A6;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.status-value {
+    display: block;
+    color: #E6F0FF;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.waiver-list {
+    background: #0A1828;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.waiver-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #2e3b4e;
+}
+
+.waiver-list-item:last-child {
+    border-bottom: none;
+}
+
+.participant-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.participant-name {
+    color: #E6F0FF;
+    font-weight: 500;
+}
+
+.waiver-status {
+    font-size: 0.875rem;
+}
+
+.status-signed {
+    color: #4CAF50;
+}
+
+.status-pending {
+    color: #FFC107;
+}
+
+.status-expired {
+    color: #F44336;
+}
+
+/* Button Styles (if not already defined) */
+.primary-button {
+    background: #FF4500;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.primary-button:hover {
+    background: #FF6533;
+}
+
+.secondary-button {
+    background: #2e3b4e;
+    color: #E6F0FF;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.secondary-button:hover {
+    background: #3e4b5e;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .waiver-status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .status-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .template-selection {
+        flex-direction: column;
+    }
+}
